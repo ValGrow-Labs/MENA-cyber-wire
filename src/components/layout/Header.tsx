@@ -1,367 +1,278 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import BrandLogo from "@/components/shared/BrandLogo";
-import { 
-  Search, 
-  Bookmark, 
-  Menu, 
-  X, 
-  Bell, 
-  Clock, 
-  User, 
-  ShieldAlert, 
-  ExternalLink,
-  ChevronRight,
-  CheckCircle2,
-  Lock
-} from "lucide-react";
-import { LocalStore } from "@/lib/storage/local-store";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { Search, Menu, X, ArrowUpRight, Bell, Bookmark } from "lucide-react";
+import BrandLogo from "@/components/shared/BrandLogo";
 import NavigationSidebar from "@/components/layout/NavigationSidebar";
+import { LocalStore } from "@/lib/storage/local-store";
+import { useSlidingIndicator } from "@/components/shared/useSlidingIndicator";
+import ThemeToggle from "@/components/shared/ThemeToggle";
+
+export const SECTIONS = [
+  { label: "Latest", href: "/" },
+  { label: "Breaking", href: "/breaking" },
+  { label: "Vulnerabilities", href: "/threats" },
+  { label: "Countries", href: "/mena" },
+  { label: "Daily brief", href: "/daily-brief" },
+  { label: "Research", href: "/research" },
+  { label: "Community", href: "/community" },
+];
+
+interface Advisory {
+  id?: string;
+  title: string;
+  source?: string;
+  sourceUrl?: string;
+  link?: string;
+  publishedDate?: string;
+}
+
+const iconBtn =
+  "relative flex h-9 w-9 items-center justify-center rounded-full text-ink-2 transition-colors duration-200 hover:bg-paper-sunk hover:text-ink";
 
 export default function Header() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
+  const pathname = usePathname();
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [bookmarkCount, setBookmarkCount] = useState(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [timeGcc, setTimeGcc] = useState("");
-  
-  // Notifications state
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [advisories, setAdvisories] = useState<any[]>([]);
-
-  // Sign-in modal state
-  const [showSignInModal, setShowSignInModal] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [advisories, setAdvisories] = useState<Advisory[]>([]);
+  const alertsRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const updateBookmarks = () => {
-      setBookmarkCount(LocalStore.getBookmarks().length);
-    };
+    const updateBookmarks = () => setBookmarkCount(LocalStore.getBookmarks().length);
     updateBookmarks();
     window.addEventListener("mena_bookmarks_changed", updateBookmarks);
-
-    const updateClock = () => {
-      const now = new Date();
-      setTimeGcc(
-        now.toLocaleTimeString("en-US", {
-          timeZone: "Asia/Riyadh",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }) + " AST"
-      );
-    };
-    updateClock();
-    const interval = setInterval(updateClock, 10000);
-
     fetch("/api/advisories")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
-          setAdvisories(data.data.slice(0, 3));
-          setUnreadNotifications(Math.min(data.data.length, 3));
-        }
-      })
+      .then((r) => r.json())
+      .then((d) => Array.isArray(d?.data) && setAdvisories(d.data.slice(0, 4)))
       .catch(() => {});
-
-    return () => {
-      window.removeEventListener("mena_bookmarks_changed", updateBookmarks);
-      clearInterval(interval);
-    };
+    return () => window.removeEventListener("mena_bookmarks_changed", updateBookmarks);
   }, []);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!alertsOpen) return;
+    const close = (e: MouseEvent) => {
+      if (alertsRef.current && !alertsRef.current.contains(e.target as Node)) setAlertsOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setAlertsOpen(false);
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [alertsOpen]);
+
+  // "/" focuses search
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)) {
+        e.preventDefault();
+        setSearchOpen(true);
+        setTimeout(() => searchRef.current?.focus(), 0);
+      }
+      if (e.key === "Escape") setSearchOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    setDrawerOpen(false);
+    setSearchOpen(false);
+  }, [pathname]);
+
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      LocalStore.addSearchHistory(searchQuery.trim());
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setMobileMenuOpen(false);
-    }
+    const q = query.trim();
+    if (!q) return;
+    LocalStore.addSearchHistory(q);
+    router.push(`/search?q=${encodeURIComponent(q)}`);
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userEmail.trim()) {
-      setIsSignedIn(true);
-      setShowSignInModal(false);
-    }
-  };
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const deskNav = useSlidingIndicator<HTMLUListElement>(pathname);
+  const mobNav = useSlidingIndicator<HTMLUListElement>(pathname);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-border bg-white/95 backdrop-blur-md transition-colors shadow-coastal">
-      <div className="max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
-          {/* Brand Logo & Mobile Menu Toggle */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-ocean hover:bg-mist transition-colors"
-              aria-label="Toggle navigation drawer"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5 text-alert-orange" /> : <Menu className="w-5 h-5" />}
-            </button>
-            <BrandLogo size="md" />
-          </div>
+    <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-modal focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+      >
+        Skip to content
+      </a>
 
-          {/* Desktop Search Bar (Coastal Tech styling) */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="hidden md:flex flex-1 max-w-lg mx-6 relative items-center"
-          >
-            <Search className="w-4 h-4 absolute left-3.5 text-slate-muted pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search MENA threats, CVEs, ransomware, Saudi, UAE..."
-              className="w-full pl-10 pr-14 py-2 text-xs rounded-xl bg-ice border border-slate-border text-slate-dark placeholder-slate-muted focus:outline-hidden focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all shadow-inner"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 px-2 py-0.5 text-[10px] font-bold text-slate-muted bg-white border border-slate-border rounded-md hover:text-teal hover:border-teal"
-            >
-              ↵
-            </button>
-          </form>
+      <header className="header-scroll sticky top-0 z-header border-b border-rule bg-paper">
+        <div aria-hidden className="read-progress pointer-events-none absolute inset-x-0 -bottom-px h-[2px] origin-left scale-x-0 bg-brand" />
+        <div className="mx-auto flex h-16 max-w-page items-center gap-6 px-4 sm:px-6 lg:px-8">
+          <button onClick={() => setDrawerOpen(true)} className={`${iconBtn} -ml-2 lg:hidden`} aria-label="Open menu">
+            <Menu className="h-5 w-5" strokeWidth={1.75} />
+          </button>
 
-          {/* Header Action Badges & Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Live Threats Indicator */}
-            <Link
-              href="/threats"
-              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-alert-light border border-alert-border text-alert-orange text-xs font-semibold hover:bg-alert-orange hover:text-white transition-all shadow-xs"
-            >
-              <span className="w-2 h-2 rounded-full bg-alert-orange animate-pulse" />
-              <span>LIVE THREATS: ELEVATED</span>
-            </Link>
+          <BrandLogo size="md" />
 
-            {/* AST Time Telemetry */}
-            {timeGcc && (
-              <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-muted font-mono px-2.5 py-1 rounded-lg bg-ice border border-slate-border">
-                <Clock className="w-3.5 h-3.5 text-teal" />
-                <span>{timeGcc}</span>
-              </div>
-            )}
+          <nav aria-label="Sections" className="hidden flex-1 lg:block">
+            <ul ref={deskNav.ref} className="relative flex w-max items-center gap-0.5">
+              <span aria-hidden className="pointer-events-none absolute left-0 top-0 rounded-full bg-ink/[0.09] ring-1 ring-inset ring-ink/10 transition-[transform,width,height,opacity] duration-500 ease-spring motion-reduce:transition-none" style={deskNav.style} />
+              {SECTIONS.map((s) => {
+                const active = isActive(s.href);
+                return (
+                  <li key={s.href}>
+                    <Link
+                      href={s.href}
+                      aria-current={active ? "page" : undefined}
+                      className={`relative block whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.9375rem] font-semibold transition-colors duration-300 ${
+                        active ? "text-ink" : "text-ink-3 hover:text-ink"
+                      }`}
+                    >
+                      {s.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
-            {/* Notifications Popover */}
-            <div className="relative">
+          <div className="ml-auto flex items-center gap-1">
+            {searchOpen ? (
+              <form onSubmit={submit} role="search" className="flex animate-rise items-center rounded-full border border-edge bg-paper-raised pl-3">
+                <Search className="h-4 w-4 text-ink-3" strokeWidth={1.75} />
+                <input
+                  ref={searchRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onBlur={() => !query && setSearchOpen(false)}
+                  placeholder="CVE, group, country"
+                  aria-label="Search"
+                  className="w-40 bg-transparent px-2.5 py-2 text-sm text-ink placeholder:text-ink-4 focus:outline-none sm:w-56"
+                />
+              </form>
+            ) : (
               <button
                 onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  setUnreadNotifications(0);
+                  setSearchOpen(true);
+                  setTimeout(() => searchRef.current?.focus(), 0);
                 }}
-                className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-border bg-white text-ocean hover:bg-mist hover:border-teal/30 transition-colors shadow-xs"
-                title="Intelligence Alerts & Advisories"
+                className={iconBtn}
+                aria-label="Search (press /)"
+                title="Search (press /)"
               >
-                <Bell className="w-4 h-4 text-ocean" />
-                {unreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-4 h-4 px-1 rounded-full bg-alert-orange text-[9px] font-bold text-white leading-none">
-                    {unreadNotifications}
-                  </span>
-                )}
+                <Search className="h-[18px] w-[18px]" strokeWidth={1.75} />
               </button>
+            )}
 
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-slate-border shadow-coastal-elevated p-4 z-50 space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-border">
-                    <span className="text-xs font-bold uppercase tracking-wider text-ocean">
-                      Government & CERT Advisories
-                    </span>
-                    <button
-                      onClick={() => setShowNotifications(false)}
-                      className="text-slate-muted hover:text-slate-dark text-xs"
-                    >
-                      Close
-                    </button>
-                  </div>
-                  <div className="space-y-2 text-xs">
-                    {advisories.length > 0 ? (
-                      advisories.map((adv: any, idx: number) => (
-                        <a
-                          key={adv.id || idx}
-                          href={adv.link || "/breaking"}
-                          target={adv.link ? "_blank" : undefined}
-                          rel={adv.link ? "noopener noreferrer" : undefined}
-                          className="block p-2.5 rounded-lg bg-ice border border-slate-border hover:border-teal/50 hover:bg-mist transition-all group"
-                        >
-                          <div className="flex items-center justify-between font-bold text-ocean mb-1">
-                            <span className="text-[10px] font-mono text-teal">
-                              {adv.source || "CISA"}
+            <div className="relative" ref={alertsRef}>
+              <button onClick={() => setAlertsOpen((v) => !v)} aria-expanded={alertsOpen} aria-label="Advisories" className={iconBtn}>
+                <Bell className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                {advisories.length > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-brand ring-2 ring-paper" aria-hidden />}
+              </button>
+              {alertsOpen && (
+                <div className="absolute right-0 top-full z-overlay mt-3 w-[min(24rem,calc(100vw-2rem))] animate-rise overflow-hidden rounded-xl border border-rule bg-paper-raised shadow-[0_24px_48px_-16px_rgb(var(--shade)/0.35)]">
+                  <p className="border-b border-rule px-4 py-3 text-sm font-semibold text-ink">Government and CERT advisories</p>
+                  {advisories.length > 0 ? (
+                    <ul>
+                      {advisories.map((a, i) => (
+                        <li key={a.id || i} className="border-b border-rule last:border-0">
+                          <a
+                            href={a.sourceUrl || a.link || "/breaking"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block px-4 py-3 transition-colors hover:bg-paper-sunk"
+                          >
+                            <span className="text-xs text-ink-3">
+                              {a.source || "Advisory"}
+                              {a.publishedDate &&
+                                `, ${new Date(a.publishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`}
                             </span>
-                            <span className="text-[10px] text-slate-muted">
-                              {adv.publishedDate ? new Date(adv.publishedDate).toLocaleDateString([], { month: "short", day: "numeric" }) : "Recent"}
-                            </span>
-                          </div>
-                          <p className="text-slate-dark text-[11px] leading-snug group-hover:text-teal font-medium">
-                            {adv.title}
-                          </p>
-                        </a>
-                      ))
-                    ) : (
-                      <div className="p-3 text-center text-slate-muted text-xs">
-                        No active emergency advisories at this time.
-                      </div>
-                    )}
-                  </div>
+                            <span className="mt-1 block text-sm font-medium leading-snug text-ink">{a.title}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="px-4 py-4 text-sm text-ink-3">No advisories loaded yet.</p>
+                  )}
                   <Link
                     href="/breaking"
-                    onClick={() => setShowNotifications(false)}
-                    className="block text-center text-xs font-bold text-teal hover:underline pt-1"
+                    onClick={() => setAlertsOpen(false)}
+                    className="flex items-center justify-between border-t border-rule px-4 py-3 text-sm font-medium text-ink hover:bg-paper-sunk"
                   >
-                    View All Advisories & Wire Alerts &rarr;
+                    All breaking coverage <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
                   </Link>
                 </div>
               )}
             </div>
 
-            {/* Bookmarks Quick Link */}
-            <Link
-              href="/saved"
-              className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-border bg-white text-ocean hover:bg-mist hover:border-teal/30 transition-colors shadow-xs"
-              title="Saved Intelligence Vault"
-            >
-              <Bookmark className="w-4 h-4 text-ocean" />
+            <ThemeToggle />
+
+            <Link href="/saved" className={iconBtn} aria-label={`Saved stories (${bookmarkCount})`}>
+              <Bookmark className="h-[18px] w-[18px]" strokeWidth={1.75} />
               {bookmarkCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-4 h-4 px-1 rounded-full bg-teal text-[9px] font-bold text-white leading-none">
+                <span className="absolute -right-0.5 top-0.5 min-w-4 rounded-full bg-ink px-1 text-center text-[10px] font-semibold leading-4 text-paper tabular">
                   {bookmarkCount}
                 </span>
               )}
             </Link>
-
-            {/* Sign-in / User Profile Button */}
-            {isSignedIn ? (
-              <button
-                onClick={() => setShowSignInModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-teal-border bg-teal-light text-teal text-xs font-bold hover:bg-teal hover:text-white transition-all shadow-xs"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Analyst Session</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowSignInModal(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-teal text-white hover:bg-teal-dark text-xs font-bold transition-all shadow-coastal"
-              >
-                <User className="w-3.5 h-3.5" />
-                <span>Analyst Portal</span>
-              </button>
-            )}
           </div>
         </div>
 
-        {/* Mobile Search Input */}
-        <div className="md:hidden pb-3">
-          <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
-            <Search className="w-4 h-4 absolute left-3 text-slate-muted" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search threats, CVEs, countries..."
-              className="w-full pl-9 pr-10 py-1.5 text-xs rounded-xl bg-ice border border-slate-border text-slate-dark placeholder-slate-muted focus:outline-hidden"
-            />
-          </form>
-        </div>
-      </div>
+        <nav aria-label="Sections" data-scroll-x className="scroll-x border-t border-rule lg:hidden">
+          <ul ref={mobNav.ref} className="relative mx-3 my-2 flex w-max gap-0.5">
+            <span aria-hidden className="pointer-events-none absolute left-0 top-0 rounded-full bg-ink/[0.09] ring-1 ring-inset ring-ink/10 transition-[transform,width,height,opacity] duration-500 ease-spring motion-reduce:transition-none" style={mobNav.style} />
+            {SECTIONS.map((s) => {
+              const active = isActive(s.href);
+              return (
+                <li key={s.href} className="shrink-0">
+                  <Link
+                    href={s.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`relative block whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold transition-colors duration-300 ${active ? "text-ink" : "text-ink-3"}`}
+                  >
+                    {s.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </header>
 
-      {/* Sign-in / Analyst Access Modal */}
-      {showSignInModal && (
-        <div className="fixed inset-0 z-50 bg-ocean-dark/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-border shadow-coastal-elevated p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-border">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-teal-light text-teal">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <h3 className="text-base font-bold text-ocean">
-                  {isSignedIn ? "Analyst Profile" : "Analyst Intelligence Portal"}
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowSignInModal(false)}
-                className="text-slate-muted hover:text-slate-dark p-1"
-              >
-                <X className="w-5 h-5" />
+      {drawerOpen && (
+        <div className="fixed inset-0 z-modal flex lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="h-full w-[85%] max-w-sm animate-rise overflow-y-auto border-r border-rule bg-paper px-5 py-5">
+            <div className="flex items-center justify-between border-b border-rule pb-4">
+              <BrandLogo size="sm" />
+              <button onClick={() => setDrawerOpen(false)} className={iconBtn} aria-label="Close menu">
+                <X className="h-5 w-5" strokeWidth={1.75} />
               </button>
             </div>
-
-            {isSignedIn ? (
-              <div className="space-y-4 text-xs">
-                <div className="p-3.5 rounded-xl bg-mist border border-mist-border space-y-1">
-                  <span className="font-bold text-ocean block text-sm">Authenticated SOC Session</span>
-                  <p className="text-slate-muted">Access token active for {userEmail || "analyst@menacyberwire.org"}.</p>
-                </div>
-                <button
-                  onClick={() => setIsSignedIn(false)}
-                  className="w-full py-2 rounded-xl border border-alert-border text-alert-orange font-bold hover:bg-alert-light transition-colors"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSignIn} className="space-y-3 text-xs">
-                <p className="text-slate-muted leading-relaxed">
-                  Sign in to follow regional threat feeds, customize CERT alerts, and publish verified practitioner research.
-                </p>
-                <div>
-                  <label className="font-bold text-ocean block mb-1">Corporate or Government Email</label>
-                  <input
-                    type="email"
-                    required
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="analyst@organization.sa or .ae"
-                    className="w-full px-3 py-2 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
-                  />
-                </div>
-                <div className="pt-2 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowSignInModal(false)}
-                    className="px-4 py-2 rounded-xl text-slate-muted font-semibold hover:text-slate-dark"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl bg-teal text-white font-bold hover:bg-teal-dark shadow-coastal"
-                  >
-                    Enter Portal
-                  </button>
-                </div>
-              </form>
-            )}
+            <form onSubmit={submit} role="search" className="mt-5 flex items-center rounded-full border border-edge bg-paper-raised pl-3">
+              <Search className="h-4 w-4 text-ink-3" strokeWidth={1.75} />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search"
+                aria-label="Search"
+                className="w-full bg-transparent px-2.5 py-2 text-sm text-ink focus:outline-none"
+              />
+            </form>
+            <div className="mt-6">
+              <NavigationSidebar />
+            </div>
           </div>
+          <button className="flex-1 bg-ink/40 backdrop-blur-sm" aria-label="Close menu" onClick={() => setDrawerOpen(false)} />
         </div>
       )}
-
-      {/* Mobile Drawer Navigation */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[115px] z-50 bg-ocean-dark/40 backdrop-blur-xs flex">
-          <div className="w-4/5 max-w-sm h-full bg-white p-4 overflow-y-auto shadow-coastal-elevated border-r border-slate-border">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-border">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-muted">
-                Intelligence Navigation
-              </span>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-1 text-slate-muted hover:text-slate-dark"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="mt-4" onClick={() => setMobileMenuOpen(false)}>
-              <NavigationSidebar isMobile />
-            </div>
-          </div>
-          <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
-        </div>
-      )}
-    </header>
+    </>
   );
 }

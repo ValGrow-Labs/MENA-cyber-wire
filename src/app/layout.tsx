@@ -1,21 +1,29 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Newsreader, Source_Sans_3, JetBrains_Mono } from "next/font/google";
+
+const sans = Source_Sans_3({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["normal", "italic"] });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500"], display: "swap" });
 import Header from "@/components/layout/Header";
-import NavigationSidebar from "@/components/layout/NavigationSidebar";
-import RightSidebar from "@/components/layout/RightSidebar";
-import MobileBottomNav from "@/components/layout/MobileBottomNav";
-import BreakingNewsTicker from "@/components/news/BreakingNewsTicker";
+import PageShell from "@/components/layout/PageShell";
 import Footer from "@/components/layout/Footer";
+import { themeInitScript } from "@/components/shared/ThemeToggle";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  themeColor: "#0D0D0E",
 };
 
 export const metadata: Metadata = {
-  title: "MENA CYBER WIRE | Regional Cyber Intelligence. Real-time Awareness.",
-  description: "Independent cybersecurity news, threat intelligence, vulnerability monitoring, and community platform for the Middle East & North Africa (GCC, Levant, North Africa).",
+  title: {
+    default: "MENA Cyber Wire: cyber security news for the Middle East & North Africa",
+    template: "%s · MENA Cyber Wire",
+  },
+  description:
+    "Independent reporting on cyber attacks, vulnerabilities and policy across the GCC, Levant and North Africa, with links to every primary source.",
   keywords: [
     "MENA cybersecurity",
     "Saudi Arabia cyber attack",
@@ -27,56 +35,28 @@ export const metadata: Metadata = {
     "CISA advisories",
     "NVD CVE",
   ],
-  authors: [{ name: "MENA Cyber Wire Editorial Team" }],
+  openGraph: {
+    title: "MENA Cyber Wire",
+    description: "Cyber security news for the Middle East & North Africa.",
+    type: "website",
+  },
+  icons: {
+    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230D0D0E' rx='7'/%3E%3Crect x='13' y='8' width='6' height='16' rx='1' fill='%23E52D27'/%3E%3C/svg%3E",
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" suppressHydrationWarning className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
-          rel="stylesheet"
-        />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-full flex flex-col font-body bg-ice text-slate-dark antialiased selection:bg-mist selection:text-teal">
-        {/* Top Header */}
+      <body className="flex min-h-dvh flex-col">
         <Header />
 
-        {/* Breaking News Ticker Strip (Coastal Tech Style) */}
-        <BreakingNewsTicker />
+        <PageShell>{children}</PageShell>
 
-        {/* Main 3-Column Editorial Grid Container */}
-        <div className="flex-1 w-full max-w-[1480px] mx-auto px-3 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Navigation Sidebar (Desktop 3 cols) */}
-            <aside className="hidden lg:block lg:col-span-3 sticky top-24 self-start">
-              <NavigationSidebar />
-            </aside>
-
-            {/* Center Content Feed (Desktop 6 cols on 12-col grid, full on mobile/tablet) */}
-            <main className="col-span-1 lg:col-span-6 w-full min-w-0 space-y-6">
-              {children}
-            </main>
-
-            {/* Right Intelligence Sidebar (Desktop 3 cols) */}
-            <aside className="hidden lg:block lg:col-span-3 sticky top-24 self-start">
-              <RightSidebar />
-            </aside>
-          </div>
-        </div>
-
-        {/* Global Footer */}
         <Footer />
-
-        {/* Mobile Fixed Bottom Navigation (Mobile & Tablet) */}
-        <MobileBottomNav />
       </body>
     </html>
   );

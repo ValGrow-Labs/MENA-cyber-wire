@@ -2,11 +2,21 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { X, Search } from "lucide-react";
 import CommunityPostCard from "@/components/community/CommunityPostCard";
 import LoadingSkeleton from "@/components/shared/LoadingSkeleton";
 import { SEED_COMMUNITY_POSTS } from "@/lib/community/seed-community";
 import { CommunityPost, CommunityComment } from "@/types/community";
-import { MessageSquare, Plus, Search, Flame, Clock, Send, ShieldCheck, X } from "lucide-react";
+
+const TOPICS = [
+  "Threat Intelligence",
+  "Compliance & Governance",
+  "Industrial Control Systems",
+  "Research & Open Source",
+  "Incident Response",
+];
+
+const COUNTRIES = ["Saudi Arabia", "United Arab Emirates", "Qatar", "Egypt", "Kuwait", "Regional MENA"];
 
 function CommunityPageContent() {
   const searchParams = useSearchParams();
@@ -17,17 +27,17 @@ function CommunityPageContent() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"hot" | "new">("hot");
 
-  // Create post modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
-  const [newTopic, setNewTopic] = useState("Threat Intelligence");
-  const [newCountry, setNewCountry] = useState("Saudi Arabia");
+  const [newTopic, setNewTopic] = useState(TOPICS[0]);
+  const [newCountry, setNewCountry] = useState(COUNTRIES[0]);
   const [newTags, setNewTags] = useState("");
+  const [formErrors, setFormErrors] = useState<{ title?: string; body?: string }>({});
 
-  // Comment modal / drawer state
   const [activePost, setActivePost] = useState<CommunityPost | null>(null);
   const [commentText, setCommentText] = useState("");
+  const [commentError, setCommentError] = useState("");
 
   useEffect(() => {
     if (highlightedPostId) {
@@ -36,18 +46,20 @@ function CommunityPageContent() {
     }
   }, [highlightedPostId, posts]);
 
-  const topics = [
-    "all",
-    "Threat Intelligence",
-    "Compliance & Governance",
-    "Industrial Control Systems",
-    "Research & Open Source",
-    "Incident Response",
-  ];
+  useEffect(() => {
+    if (!activePost) return;
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setActivePost(null);
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [activePost]);
 
   const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newBody.trim()) return;
+    const errors: { title?: string; body?: string } = {};
+    if (newTitle.trim().length < 10) errors.title = "Write a title of at least 10 characters.";
+    if (newBody.trim().length < 30) errors.body = "Add some context: at least 30 characters.";
+    setFormErrors(errors);
+    if (Object.keys(errors).length) return;
 
     const created: CommunityPost = {
       id: `user-post-${Date.now()}`,
@@ -55,12 +67,7 @@ function CommunityPageContent() {
       body: newBody.trim(),
       topic: newTopic,
       country: newCountry,
-      author: {
-        name: "Security Practitioner",
-        handle: "@analyst_mena",
-        role: "SOC Analyst",
-        verified: false,
-      },
+      author: { name: "You", handle: "@you", role: "Member", verified: false },
       timestamp: new Date().toISOString(),
       upvotes: 0,
       downvotes: 0,
@@ -72,341 +79,268 @@ function CommunityPageContent() {
     };
 
     setPosts([created, ...posts]);
-    setIsModalOpen(false);
+    setComposerOpen(false);
     setNewTitle("");
     setNewBody("");
     setNewTags("");
+    setSortBy("new");
   };
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentText.trim() || !activePost) return;
+    if (!activePost) return;
+    if (!commentText.trim()) {
+      setCommentError("Write a reply before posting.");
+      return;
+    }
+    setCommentError("");
 
     const newComment: CommunityComment = {
       id: `comm-${Date.now()}`,
       postId: activePost.id,
-      author: {
-        name: "Security Practitioner",
-        handle: "@practitioner_local",
-        role: "SOC Analyst",
-        verified: false,
-      },
+      author: { name: "You", handle: "@you", role: "Member", verified: false },
       timestamp: new Date().toISOString(),
       content: commentText.trim(),
-      upvotes: 1,
+      upvotes: 0,
     };
 
-    const updatedPost = {
+    const updated = {
       ...activePost,
       commentsCount: activePost.commentsCount + 1,
       comments: [...(activePost.comments || []), newComment],
     };
-
-    setActivePost(updatedPost);
-    setPosts(posts.map((p) => (p.id === activePost.id ? updatedPost : p)));
+    setActivePost(updated);
+    setPosts(posts.map((p) => (p.id === activePost.id ? updated : p)));
     setCommentText("");
   };
 
-  const filteredPosts = posts.filter((p) => {
+  const filtered = posts.filter((p) => {
     if (selectedTopic !== "all" && p.topic !== selectedTopic) return false;
     if (search) {
       const s = search.toLowerCase();
-      return (
-        p.title.toLowerCase().includes(s) ||
-        p.body.toLowerCase().includes(s) ||
-        p.country.toLowerCase().includes(s)
-      );
+      return p.title.toLowerCase().includes(s) || p.body.toLowerCase().includes(s) || p.country.toLowerCase().includes(s);
     }
     return true;
   });
 
   if (sortBy === "hot") {
-    filteredPosts.sort((a, b) => b.upvotes * 2 + b.commentsCount * 3 - (a.upvotes * 2 + a.commentsCount * 3));
+    filtered.sort((a, b) => b.upvotes * 2 + b.commentsCount * 3 - (a.upvotes * 2 + a.commentsCount * 3));
   } else {
-    filteredPosts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
   return (
-    <div className="space-y-6">
-      {/* Community Banner in Coastal Tech styling */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-border shadow-coastal-card flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="p-1 rounded-md bg-teal-light text-teal">
-              <MessageSquare className="w-4 h-4 text-teal" />
-            </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-teal">
-              Practitioner Intelligence Exchange
-            </span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold font-heading text-ocean">
-            Practitioner Discussions & Tradecraft
-          </h1>
-          <p className="text-xs text-slate-muted max-w-xl leading-relaxed">
-            A regional intelligence exchange for CISOs, SOC analysts, and security engineers. Share verified indicators, regulatory compliance practices (NCA ECC), and defensive tradecraft.
+    <div className="space-y-10">
+      <header className="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p className="kicker">Community</p>
+          <h1 className="mt-2 font-serif text-4xl font-semibold tracking-[-0.02em] text-ink sm:text-5xl">Practitioner discussions</h1>
+          <p className="mt-3 max-w-prose font-serif text-lg text-ink-2">
+            Questions and field notes from people defending networks in the region.
           </p>
         </div>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-teal text-white font-bold text-xs hover:bg-teal-dark transition-all shadow-coastal"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Start Discussion</span>
+        <button onClick={() => setComposerOpen((v) => !v)} aria-expanded={composerOpen} className="btn-primary">
+          {composerOpen ? "Close" : "Start a discussion"}
         </button>
-      </div>
+      </header>
 
-      {/* Topics & Sort Controls */}
-      <div className="p-3.5 bg-white rounded-2xl border border-slate-border shadow-coastal-card space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Topic Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            {topics.map((t) => (
+      {composerOpen && (
+        <form onSubmit={handleCreatePost} noValidate className="animate-rise border-t-2 border-edge pt-5">
+          <h2 className="section-title">New discussion</h2>
+          <div className="mt-5 grid gap-5">
+            <div>
+              <label htmlFor="post-title" className="kicker mb-1.5 block text-ink">Title</label>
+              <input
+                id="post-title"
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="How are teams applying aeCERT guidance to healthcare cloud workloads?"
+                aria-invalid={!!formErrors.title}
+                className={`field ${formErrors.title ? "border-signal" : ""}`}
+              />
+              {formErrors.title && <p className="mt-1.5 text-sm text-signal">{formErrors.title}</p>}
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="post-topic" className="kicker mb-1.5 block text-ink">Topic</label>
+                <select id="post-topic" value={newTopic} onChange={(e) => setNewTopic(e.target.value)} className="field">
+                  {TOPICS.map((t) => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="post-country" className="kicker mb-1.5 block text-ink">Country</label>
+                <select id="post-country" value={newCountry} onChange={(e) => setNewCountry(e.target.value)} className="field">
+                  {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="post-body" className="kicker mb-1.5 block text-ink">Context</label>
+              <textarea
+                id="post-body"
+                rows={5}
+                value={newBody}
+                onChange={(e) => setNewBody(e.target.value)}
+                placeholder="What are you seeing, what have you tried, and what do you want to know?"
+                aria-invalid={!!formErrors.body}
+                className={`field ${formErrors.body ? "border-signal" : ""}`}
+              />
+              {formErrors.body && <p className="mt-1.5 text-sm text-signal">{formErrors.body}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="post-tags" className="kicker mb-1.5 block text-ink">Tags</label>
+              <input
+                id="post-tags"
+                type="text"
+                value={newTags}
+                onChange={(e) => setNewTags(e.target.value)}
+                placeholder="NCA, CloudSecurity, IncidentResponse"
+                className="field"
+              />
+              <p className="mt-1.5 text-sm text-ink-3">Separate tags with commas.</p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <button type="submit" className="btn-primary">Post discussion</button>
+              <button type="button" onClick={() => setComposerOpen(false)} className="text-sm text-ink-3 hover:text-ink">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      <section aria-label="Discussions">
+        <div className="section-head items-end">
+          <div role="tablist" aria-label="Sort" className="-mb-3 flex gap-5">
+            {(["hot", "new"] as const).map((s) => (
               <button
-                key={t}
-                onClick={() => setSelectedTopic(t)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize whitespace-nowrap transition-all ${
-                  selectedTopic === t
-                    ? "bg-teal text-white shadow-coastal"
-                    : "text-slate-dark hover:bg-mist hover:text-teal"
+                key={s}
+                role="tab"
+                aria-selected={sortBy === s}
+                onClick={() => setSortBy(s)}
+                className={`border-b-[3px] pb-2.5 font-serif text-lg transition-colors ${
+                  sortBy === s ? "border-signal text-ink" : "border-transparent text-ink-3 hover:text-ink"
                 }`}
               >
-                {t}
+                {s === "hot" ? "Most active" : "Newest"}
               </button>
             ))}
           </div>
-
-          {/* Sort Buttons */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setSortBy("hot")}
-              className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold ${
-                sortBy === "hot" ? "bg-ocean text-white shadow-xs" : "text-slate-muted hover:text-ocean"
-              }`}
-            >
-              <Flame className="w-3.5 h-3.5 text-amber-desert" />
-              <span>Hot</span>
-            </button>
-            <button
-              onClick={() => setSortBy("new")}
-              className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold ${
-                sortBy === "new" ? "bg-ocean text-white shadow-xs" : "text-slate-muted hover:text-ocean"
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5 text-amber-desert" />
-              <span>New</span>
-            </button>
-          </div>
+          <label className="flex w-full max-w-[14rem] items-center border-b border-rule focus-within:border-ink">
+            <Search className="h-4 w-4 shrink-0 text-ink-3" strokeWidth={1.5} />
+            <span className="sr-only">Filter discussions</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Filter discussions"
+              className="w-full bg-transparent px-2 py-1.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none"
+            />
+          </label>
         </div>
 
-        {/* Search */}
-        <div className="relative flex items-center pt-2 border-t border-slate-border">
-          <Search className="w-4 h-4 absolute left-3 text-slate-muted" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search discussions by topic, keyword, or country..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-ice border border-slate-border text-slate-dark placeholder-slate-muted focus:outline-hidden focus:border-teal"
-          />
+        <div className="mt-3 flex gap-x-5 gap-y-2 overflow-x-auto pb-1 text-xs font-medium [scrollbar-width:none]">
+          {["all", ...TOPICS].map((t) => (
+            <button
+              key={t}
+              onClick={() => setSelectedTopic(t)}
+              aria-pressed={selectedTopic === t}
+              className={`shrink-0 ${
+                selectedTopic === t ? "text-ink underline decoration-1 underline-offset-4" : "text-ink-3 hover:text-ink"
+              }`}
+            >
+              {t === "all" ? "All topics" : t}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Discussions Feed */}
-      <div className="space-y-4">
-        {filteredPosts.map((post) => (
-          <div key={post.id} onClick={() => setActivePost(post)} className="cursor-pointer">
-            <CommunityPostCard post={post} />
-          </div>
-        ))}
-      </div>
+        <div className="mt-4 border-b border-rule">
+          {filtered.length === 0 ? (
+            <div className="border-t border-rule py-12">
+              <p className="font-serif text-2xl text-ink">No discussions match.</p>
+              <p className="mt-2 text-ink-2">Try another topic, or start the conversation yourself.</p>
+            </div>
+          ) : (
+            filtered.map((post) => (
+              <CommunityPostCard key={post.id} post={post} onOpen={() => setActivePost(post)} />
+            ))
+          )}
+        </div>
+      </section>
 
-      {/* Discussion Detail & Threading Modal */}
+      {/* Thread slide-over */}
       {activePost && (
-        <div className="fixed inset-0 z-50 bg-ocean-dark/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl max-h-[85vh] bg-white rounded-2xl border border-slate-border shadow-coastal-elevated flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className="p-4 border-b border-slate-border flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-teal">
-                  {activePost.country} &middot; {activePost.topic}
-                </span>
-                <h3 className="text-base font-bold text-ocean line-clamp-1">
+        <div className="fixed inset-0 z-modal flex justify-end" role="dialog" aria-modal="true" aria-labelledby="thread-title">
+          <button className="flex-1 bg-ink/30" aria-label="Close discussion" onClick={() => setActivePost(null)} />
+          <div className="flex h-full w-full max-w-xl animate-rise flex-col border-l border-edge bg-paper">
+            <div className="flex items-start justify-between gap-4 border-b border-edge px-6 py-5">
+              <div className="min-w-0">
+                <p className="kicker">{activePost.country} · {activePost.topic}</p>
+                <h2 id="thread-title" className="mt-2 font-serif text-2xl font-semibold leading-tight text-ink">
                   {activePost.title}
-                </h3>
+                </h2>
               </div>
-              <button
-                onClick={() => setActivePost(null)}
-                className="p-1.5 text-slate-muted hover:text-slate-dark rounded-lg"
-              >
-                <X className="w-5 h-5" />
+              <button onClick={() => setActivePost(null)} className="p-1 text-ink-3 hover:text-ink" aria-label="Close">
+                <X className="h-5 w-5" strokeWidth={1.5} />
               </button>
             </div>
 
-            {/* Content & Thread Scroll Area */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-5">
-              <div className="p-4 rounded-xl bg-mist border border-mist-border">
-                <p className="text-xs sm:text-sm text-slate-dark leading-relaxed">
-                  {activePost.body}
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              <p className="text-sm text-ink-3">
+                {activePost.author.name} ·{" "}
+                <span className="text-xs font-medium tabular">
+                  {new Date(activePost.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                </span>
+              </p>
+              <p className="mt-3 font-serif text-lg leading-relaxed text-ink-2">{activePost.body}</p>
+
+              <div className="mt-8 border-t-2 border-edge pt-2.5">
+                <p className="kicker text-ink">
+                  Replies <span className="tabular">({activePost.comments?.length || 0})</span>
                 </p>
               </div>
-
-              {/* Comments Thread */}
-              <div className="space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-muted block">
-                  Practitioner Responses ({activePost.comments?.length || 0})
-                </span>
-
-                {activePost.comments && activePost.comments.length > 0 ? (
-                  activePost.comments.map((c) => (
-                    <div
-                      key={c.id}
-                      className="p-3.5 rounded-xl bg-ice border border-slate-border space-y-1.5"
-                    >
-                      <div className="flex items-center justify-between text-[11px] text-slate-muted">
-                        <span className="font-bold text-ocean">
-                          {c.author.name} ({c.author.role})
+              {activePost.comments && activePost.comments.length > 0 ? (
+                <ol>
+                  {activePost.comments.map((c) => (
+                    <li key={c.id} className="border-b border-rule py-4">
+                      <p className="flex justify-between gap-3 text-sm">
+                        <span className="text-ink">{c.author.name} <span className="text-ink-3">· {c.author.role}</span></span>
+                        <span className="font-mono text-2xs text-ink-3 tabular">
+                          {new Date(c.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                         </span>
-                        <span className="font-mono">{new Date(c.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-                      </div>
-                      <p className="text-xs text-slate-dark leading-relaxed">
-                        {c.content}
                       </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-muted italic">No comments yet. Be the first to share tradecraft.</p>
-                )}
-              </div>
+                      <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-2">{c.content}</p>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="py-4 text-ink-3">No replies yet.</p>
+              )}
             </div>
 
-            {/* Comment Submission Bar */}
-            <form onSubmit={handleAddComment} className="p-3 border-t border-slate-border bg-ice flex items-center gap-2">
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Share technical observations or remediation tips..."
-                className="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 text-xs font-bold rounded-xl bg-teal text-white hover:bg-teal-dark shadow-coastal flex items-center gap-1.5"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Reply</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Start Discussion Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ocean-dark/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl border border-slate-border shadow-coastal-elevated p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-border">
-              <h3 className="text-base font-bold text-ocean">
-                Start Community Discussion
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-muted hover:text-slate-dark">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreatePost} className="space-y-3 text-xs">
-              <div>
-                <label className="font-bold text-ocean block mb-1">
-                  Discussion Title
-                </label>
+            <form onSubmit={handleAddComment} noValidate className="border-t border-edge px-6 py-4">
+              <label htmlFor="reply" className="kicker mb-1.5 block text-ink">Your reply</label>
+              <div className="flex gap-3">
                 <input
+                  id="reply"
                   type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Recommendations for implementing aeCERT guidelines for healthcare cloud?"
-                  className="w-full px-3 py-2 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
+                  value={commentText}
+                  onChange={(e) => {
+                    setCommentText(e.target.value);
+                    if (commentError) setCommentError("");
+                  }}
+                  placeholder="Share what worked, or what didn't"
+                  aria-invalid={!!commentError}
+                  className={`field ${commentError ? "border-signal" : ""}`}
                 />
+                <button type="submit" className="btn-primary shrink-0">Reply</button>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-ocean block mb-1">
-                    Topic
-                  </label>
-                  <select
-                    value={newTopic}
-                    onChange={(e) => setNewTopic(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
-                  >
-                    <option>Threat Intelligence</option>
-                    <option>Compliance & Governance</option>
-                    <option>Industrial Control Systems</option>
-                    <option>Research & Open Source</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="font-bold text-ocean block mb-1">
-                    Country
-                  </label>
-                  <select
-                    value={newCountry}
-                    onChange={(e) => setNewCountry(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
-                  >
-                    <option>Saudi Arabia</option>
-                    <option>United Arab Emirates</option>
-                    <option>Qatar</option>
-                    <option>Egypt</option>
-                    <option>Kuwait</option>
-                    <option>Regional MENA</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="font-bold text-ocean block mb-1">
-                  Discussion Context / Question
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  value={newBody}
-                  onChange={(e) => setNewBody(e.target.value)}
-                  placeholder="Provide technical context, observations, or architecture questions..."
-                  className="w-full px-3 py-2 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-ocean block mb-1">
-                  Tags (comma separated)
-                </label>
-                <input
-                  type="text"
-                  value={newTags}
-                  onChange={(e) => setNewTags(e.target.value)}
-                  placeholder="e.g. NCA, CloudSecurity, IncidentResponse"
-                  className="w-full px-3 py-2 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-muted hover:text-slate-dark"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-teal text-white hover:bg-teal-dark shadow-coastal"
-                >
-                  Post Discussion
-                </button>
-              </div>
+              {commentError && <p className="mt-1.5 text-sm text-signal">{commentError}</p>}
             </form>
           </div>
         </div>

@@ -1,24 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LocalStore, BookmarkItem } from "@/lib/storage/local-store";
-import { Bookmark, Trash2, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { LocalStore, BookmarkItem } from "@/lib/storage/local-store";
 
 export default function SavedPage() {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
-  const loadBookmarks = () => {
+  const load = () => {
     setBookmarks(LocalStore.getBookmarks());
+    setLoaded(true);
   };
 
   useEffect(() => {
-    loadBookmarks();
-    window.addEventListener("mena_bookmarks_changed", loadBookmarks);
-    return () => window.removeEventListener("mena_bookmarks_changed", loadBookmarks);
+    load();
+    window.addEventListener("mena_bookmarks_changed", load);
+    return () => window.removeEventListener("mena_bookmarks_changed", load);
   }, []);
 
-  const handleRemove = (id: string) => {
+  useEffect(() => {
+    if (!confirmClear) return;
+    const t = setTimeout(() => setConfirmClear(false), 4000);
+    return () => clearTimeout(t);
+  }, [confirmClear]);
+
+  const remove = (id: string) => {
     LocalStore.toggleBookmark({
       id,
       title: "",
@@ -29,118 +37,108 @@ export default function SavedPage() {
       severity: "",
       savedAt: "",
     });
-    loadBookmarks();
+    load();
   };
 
-  const handleClearAll = () => {
-    if (confirm("Clear all saved bookmarks?")) {
-      try {
-        localStorage.removeItem("mena_cyber_wire_bookmarks");
-        window.dispatchEvent(new Event("mena_bookmarks_changed"));
-        setBookmarks([]);
-      } catch {}
+  const clearAll = () => {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      return;
     }
+    try {
+      localStorage.removeItem("mena_cyber_wire_bookmarks");
+      window.dispatchEvent(new Event("mena_bookmarks_changed"));
+      setBookmarks([]);
+    } catch {}
+    setConfirmClear(false);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-border shadow-coastal-card flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-10">
+      <header className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-1 text-teal">
-            <Bookmark className="w-4 h-4 fill-current" />
-            <span className="text-xs font-bold uppercase tracking-wider">
-              Saved Intelligence Vault
-            </span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold font-heading text-ocean">
-            Bookmarked Reports & Advisories
-          </h1>
-          <p className="text-xs text-slate-muted mt-0.5">
-            Locally stored intelligence items for offline reference and investigation.
+          <p className="kicker">Saved</p>
+          <h1 className="mt-2 font-serif text-4xl font-semibold tracking-[-0.02em] text-ink sm:text-5xl">Your reading list</h1>
+          <p className="mt-3 max-w-prose font-serif text-lg text-ink-2">
+            Stories you saved. They stay in this browser only.
           </p>
         </div>
-
         {bookmarks.length > 0 && (
           <button
-            onClick={handleClearAll}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-alert-orange bg-alert-light border border-alert-border hover:bg-alert-orange hover:text-white transition-colors"
+            onClick={clearAll}
+            className={`text-xs font-medium transition-colors ${
+              confirmClear ? "text-signal" : "text-ink-3 hover:text-ink"
+            }`}
           >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Clear All</span>
+            {confirmClear ? "Click again to remove all" : "Remove all"}
           </button>
         )}
-      </div>
+      </header>
 
-      {/* Bookmarks List */}
-      {bookmarks.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-white border border-slate-border shadow-coastal-card space-y-3">
-          <div className="inline-flex p-3 rounded-full bg-mist text-teal">
-            <Bookmark className="w-6 h-6" />
+      {loaded && bookmarks.length === 0 ? (
+        <div className="border-t-2 border-edge pt-8">
+          <div className="grid gap-8 md:grid-cols-12">
+            <div className="md:col-span-7">
+              <p className="font-serif text-3xl leading-tight text-ink">Nothing saved yet.</p>
+              <p className="mt-3 max-w-prose text-ink-2">
+                Use <span className="text-xs font-medium text-ink">Save</span> on any story to keep
+                it here for later. Saved stories don&apos;t sync between devices.
+              </p>
+              <Link href="/" className="btn-primary mt-6">
+                Go to latest stories
+              </Link>
+            </div>
+            <ol className="hidden space-y-3 md:col-span-5 md:block" aria-hidden>
+              {[0.9, 0.7, 0.8].map((w, i) => (
+                <li key={i} className="border-t border-rule pt-3">
+                  <div className="h-2.5 w-16 bg-paper-sunk" />
+                  <div className="mt-2 h-4 bg-paper-sunk" style={{ width: `${w * 100}%` }} />
+                </li>
+              ))}
+            </ol>
           </div>
-          <h3 className="text-sm font-bold text-ocean">
-            No Saved Intelligence Reports
-          </h3>
-          <p className="text-xs text-slate-muted max-w-sm mx-auto">
-            Click the bookmark icon on any news report or vulnerability card to pin it to your personal intelligence vault.
-          </p>
-          <Link
-            href="/"
-            className="inline-block mt-2 px-4 py-2 rounded-xl text-xs font-bold bg-teal text-white hover:bg-teal-dark shadow-coastal"
-          >
-            Explore Intelligence Feed
-          </Link>
         </div>
       ) : (
-        <div className="space-y-3">
-          {bookmarks.map((item) => (
-            <div
-              key={item.id}
-              className="p-4 rounded-2xl bg-white border border-slate-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-teal/50 hover:shadow-coastal transition-all"
-            >
-              <div className="space-y-1 min-w-0 flex-1">
-                <div className="flex items-center gap-2 text-xs text-slate-muted">
-                  <span className="font-bold text-ocean">{item.sourceName}</span>
-                  {item.country && (
-                    <>
-                      <span>&middot;</span>
-                      <span className="text-teal font-bold">{item.country}</span>
-                    </>
-                  )}
-                  <span>&middot;</span>
-                  <span>{item.category}</span>
+        <section aria-label="Saved stories">
+          <div className="section-head">
+            <h2 className="section-title">Saved stories</h2>
+            <span className="text-xs font-medium text-ink-3 tabular">{bookmarks.length}</span>
+          </div>
+          <ol className="border-b border-rule">
+            {bookmarks.map((item) => (
+              <li
+                key={item.id}
+                className="group grid grid-cols-[4rem_1fr] gap-x-5 border-t border-rule py-5 first:border-t-0 sm:grid-cols-[5.5rem_1fr_auto]"
+              >
+                <span className="font-mono text-xs leading-5 text-ink-3 tabular">
+                  {item.savedAt
+                    ? new Date(item.savedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+                    : "-"}
+                </span>
+                <div className="min-w-0">
+                  <p className="kicker flex flex-wrap gap-x-3">
+                    {item.country && <span>{item.country}</span>}
+                    {item.category && <span>{item.category}</span>}
+                  </p>
+                  <Link href={`/article/${item.id}`}>
+                    <h3 className="mt-1.5 font-serif text-xl font-semibold leading-snug text-ink decoration-1 underline-offset-[5px] group-hover:underline">
+                      {item.title}
+                    </h3>
+                  </Link>
+                  <p className="mt-1.5 text-sm text-ink-3">{item.sourceName}</p>
                 </div>
-
-                <Link href={`/article/${item.id}`}>
-                  <h3 className="text-sm sm:text-base font-bold text-ocean hover:text-teal transition-colors">
-                    {item.title}
-                  </h3>
-                </Link>
-
-                <div className="text-[10px] text-slate-muted font-mono">
-                  Saved {new Date(item.savedAt).toLocaleDateString()}
+                <div className="col-start-2 mt-3 flex items-start gap-4 text-xs font-medium sm:col-start-auto sm:mt-1">
+                  <Link href={`/article/${item.id}`} className="text-ink hover:underline hover:underline-offset-4">
+                    Read
+                  </Link>
+                  <button onClick={() => remove(item.id)} className="text-ink-3 hover:text-signal" aria-label={`Remove ${item.title}`}>
+                    Remove
+                  </button>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <Link
-                  href={`/article/${item.id}`}
-                  className="px-3.5 py-1 text-xs font-bold rounded-lg bg-ice text-ocean hover:bg-teal hover:text-white border border-slate-border transition-colors"
-                >
-                  Read
-                </Link>
-
-                <button
-                  onClick={() => handleRemove(item.id)}
-                  className="p-1.5 rounded-lg text-slate-muted hover:text-alert-orange hover:bg-alert-light transition-colors"
-                  title="Remove bookmark"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+              </li>
+            ))}
+          </ol>
+        </section>
       )}
     </div>
   );

@@ -7,169 +7,212 @@ import { CountryData } from "@/types/country";
 import { NewsArticle } from "@/types/news";
 import NewsCard from "@/components/news/NewsCard";
 import LoadingSkeleton from "@/components/shared/LoadingSkeleton";
-import { Globe2 } from "lucide-react";
+import { LocalStore } from "@/lib/storage/local-store";
+
+const REGIONS: CountryData["region"][] = ["Gulf", "Levant", "North Africa"];
+const LEVEL: Record<CountryData["threatLevel"], number> = { Guarded: 1, Elevated: 2, High: 3, Critical: 4 };
+
+function findCountry(code: string | null) {
+  if (!code) return undefined;
+  const c = code.toLowerCase();
+  return MENA_COUNTRIES.find((x) => x.code.toLowerCase() === c || x.name.toLowerCase() === c);
+}
+
+function LevelBars({ level, inverted = false }: { level: number; inverted?: boolean }) {
+  return (
+    <span className="flex items-end gap-[2px]" aria-hidden>
+      {[1, 2, 3, 4].map((i) => (
+        <span
+          key={i}
+          className={`w-[3px] ${
+            i <= level ? (level >= 3 ? "bg-signal" : inverted ? "bg-paper" : "bg-ink") : inverted ? "bg-paper/25" : "bg-rule"
+          }`}
+          style={{ height: `${3 + i * 2}px` }}
+        />
+      ))}
+    </span>
+  );
+}
 
 function MenaWatchContent() {
   const searchParams = useSearchParams();
-  const initialCountryCode = searchParams.get("country") || "SA";
-
-  const [selectedCountry, setSelectedCountry] = useState<CountryData>(() => {
-    return MENA_COUNTRIES.find((c) => c.code.toLowerCase() === initialCountryCode.toLowerCase()) || MENA_COUNTRIES[0];
-  });
-
-  const [countryArticles, setCountryArticles] = useState<NewsArticle[]>([]);
+  const [selected, setSelected] = useState<CountryData>(
+    () => findCountry(searchParams.get("country")) || MENA_COUNTRIES.find((c) => c.code === "SA") || MENA_COUNTRIES[0]
+  );
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [followed, setFollowed] = useState<string[]>([]);
 
   useEffect(() => {
-    const code = searchParams.get("country");
-    if (code) {
-      const match = MENA_COUNTRIES.find((c) => c.code.toLowerCase() === code.toLowerCase());
-      if (match) setSelectedCountry(match);
-    }
+    const match = findCountry(searchParams.get("country"));
+    if (match) setSelected(match);
   }, [searchParams]);
 
   useEffect(() => {
+    const sync = () => setFollowed(LocalStore.getFollowedCountries());
+    sync();
+    window.addEventListener("mena_followed_changed", sync);
+    return () => window.removeEventListener("mena_followed_changed", sync);
+  }, []);
+
+  useEffect(() => {
     setLoading(true);
-    fetch(`/api/news?country=${encodeURIComponent(selectedCountry.name)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setCountryArticles(data.data || []);
-      })
-      .catch((err) => console.warn(err))
+    fetch(`/api/news?country=${encodeURIComponent(selected.name)}`)
+      .then((r) => r.json())
+      .then((d) => setArticles(Array.isArray(d?.data) ? d.data : []))
+      .catch(() => setArticles([]))
       .finally(() => setLoading(false));
-  }, [selectedCountry]);
+  }, [selected]);
+
+  const toggleFollow = (code: string) => {
+    LocalStore.toggleFollowCountry(code);
+    setFollowed(LocalStore.getFollowedCountries());
+  };
+
+  const pick = (c: CountryData) => {
+    setSelected(c);
+    const url = new URL(window.location.href);
+    url.searchParams.set("country", c.code);
+    window.history.replaceState(null, "", url.toString());
+  };
+
+  const isFollowing = followed.includes(selected.code);
+  const level = LEVEL[selected.threatLevel] ?? 1;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-border shadow-coastal-card">
-        <div className="flex items-center gap-2 mb-1">
-          <Globe2 className="w-5 h-5 text-teal" />
-          <span className="text-xs font-bold uppercase tracking-wider text-teal">
-            Regional Intelligence Dossier
-          </span>
-        </div>
-        <h1 className="text-xl sm:text-2xl font-bold font-heading text-ocean">
-          MENA Watch: 13 National Cyber Profiles & Directives
+    <div>
+      <header className="pb-6">
+        <p className="kicker">Country desks</p>
+        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-[-0.02em] text-ink sm:text-5xl">
+          Thirteen countries, one region
         </h1>
-        <p className="text-xs text-slate-muted max-w-2xl mt-1 leading-relaxed">
-          Select any of the 13 monitored nations to review national CERT mandates, critical infrastructure exposure profiles, and active incidents.
+        <p className="mt-3 max-w-prose font-serif text-lg text-ink-2">
+          National CERTs, exposed sectors and the latest reporting for each country we cover.
         </p>
-      </div>
+      </header>
 
-      {/* Country Selector Grid */}
-      <div className="p-4 bg-white rounded-2xl border border-slate-border shadow-coastal-card">
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-muted block mb-3">
-          Select Nation
-        </span>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
-          {MENA_COUNTRIES.map((c) => {
-            const isSelected = c.code === selectedCountry.code;
+      <div className="grid gap-10 border-t-2 border-edge pt-6 md:grid-cols-12">
+        {/* Index */}
+        <nav aria-label="Countries" className="md:col-span-4">
+          {REGIONS.map((region) => {
+            const list = MENA_COUNTRIES.filter((c) => c.region === region);
+            if (!list.length) return null;
             return (
-              <button
-                key={c.code}
-                onClick={() => setSelectedCountry(c)}
-                className={`p-3 rounded-xl flex flex-col items-center justify-center text-center transition-all ${
-                  isSelected
-                    ? "bg-teal text-white font-bold shadow-coastal scale-102"
-                    : "bg-ice text-slate-dark border border-slate-border hover:border-teal hover:bg-mist"
-                }`}
-              >
-                <span className="text-2xl mb-1">{c.flag}</span>
-                <span className="text-xs font-semibold truncate w-full">{c.name}</span>
-                <span className="text-[10px] opacity-80">{c.code}</span>
-              </button>
+              <div key={region} className="mb-6 last:mb-0">
+                <p className="kicker mb-1">{region}</p>
+                <ul>
+                  {list.map((c) => {
+                    const sel = c.code === selected.code;
+                    const on = followed.includes(c.code);
+                    return (
+                      <li key={c.code}>
+                        <button
+                          onClick={() => pick(c)}
+                          aria-current={sel ? "true" : undefined}
+                          className={`grid w-full grid-cols-[2rem_1fr_auto] items-center gap-2 border-b border-rule px-1.5 py-2 text-left text-sm transition-colors ${
+                            sel ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-raised hover:text-ink"
+                          }`}
+                        >
+                          <span className={`font-mono text-2xs ${sel ? "text-paper/60" : "text-ink-3"}`}>{c.code}</span>
+                          <span className="truncate">
+                            {c.name}
+                            {on && (
+                              <span className={`ml-2 font-mono text-2xs ${sel ? "text-paper/60" : "text-ink-3"}`} title="Following">
+                                ●
+                              </span>
+                            )}
+                          </span>
+                          <LevelBars level={LEVEL[c.threatLevel] ?? 1} inverted={sel} />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             );
           })}
-        </div>
-      </div>
+        </nav>
 
-      {/* Selected Country Detailed Dossier Card */}
-      <div className="p-6 rounded-2xl bg-mist/60 border border-mist-border shadow-coastal-card space-y-4">
-        <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-mist-border">
-          <div className="flex items-center gap-4">
-            <span className="text-4xl">{selectedCountry.flag}</span>
+        {/* Desk */}
+        <section key={selected.code} aria-label={`${selected.name} desk`} className="animate-rise md:col-span-8">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-2xl font-bold font-heading text-ocean">
-                  {selectedCountry.name}
-                </h2>
-                <span className="text-sm text-slate-muted font-medium">
-                  {selectedCountry.nativeName}
-                </span>
-              </div>
-              <p className="text-xs font-mono text-teal font-semibold mt-0.5">
-                Designated CERT: <strong className="text-ocean">{selectedCountry.certAgency}</strong>
+              <p className="kicker">{selected.region} desk</p>
+              <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight text-ink">{selected.name}</h2>
+              <p className="mt-1 font-serif text-xl text-ink-3" lang="ar" dir="rtl">
+                {selected.nativeName}
               </p>
             </div>
+            <button
+              onClick={() => toggleFollow(selected.code)}
+              aria-pressed={isFollowing}
+              className={`btn ${
+                isFollowing ? "bg-ink text-paper hover:bg-signal" : "border border-edge text-ink hover:bg-ink hover:text-paper"
+              }`}
+            >
+              {isFollowing ? "Following" : "Follow"}
+            </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className={`px-3 py-1 text-xs font-bold rounded-lg uppercase ${
-              selectedCountry.threatLevel === "High"
-                ? "bg-alert-light text-alert-orange border border-alert-border"
-                : "bg-amber-light text-amber-dark border border-amber-border"
-            }`}>
-              Threat: {selectedCountry.threatLevel}
-            </span>
-            <span className="px-3 py-1 text-xs font-bold rounded-lg bg-white text-ocean border border-slate-border">
-              {selectedCountry.activeIncidents} active incident{selectedCountry.activeIncidents > 1 ? "s" : ""}
-            </span>
-          </div>
-        </div>
+          <dl className="mt-6 grid border-y border-rule sm:grid-cols-[auto_1fr]">
+            <div className="py-3 sm:pr-6">
+              <dt className="kicker">Our assessment</dt>
+              <dd className={`mt-1 flex items-center gap-2 font-serif text-xl ${level >= 3 ? "text-signal" : "text-ink"}`}>
+                <LevelBars level={level} />
+                {selected.threatLevel}
+              </dd>
+            </div>
+            <div className="border-t border-rule py-3 sm:border-l sm:border-t-0 sm:pl-6">
+              <dt className="kicker">National CERT</dt>
+              <dd className="mt-1 font-serif text-xl text-ink">{selected.certAgency}</dd>
+            </div>
+          </dl>
 
-        {/* Narrative Summary */}
-        <p className="text-sm text-slate-dark leading-relaxed">
-          {selectedCountry.summary}
-        </p>
+          <p className="mt-5 max-w-prose text-[1.0625rem] leading-relaxed text-ink-2">{selected.summary}</p>
 
-        {/* Critical Infrastructure Exposure */}
-        <div className="pt-3 border-t border-mist-border">
-          <span className="text-xs font-bold uppercase tracking-wider text-ocean block mb-2">
-            Monitored Critical Verticals:
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {selectedCountry.criticalInfrastructureSectors.map((sector) => (
-              <span
-                key={sector}
-                className="px-3 py-1 text-xs rounded-lg bg-white text-ocean border border-slate-border font-medium shadow-2xs"
-              >
-                {sector}
-              </span>
-            ))}
+          <div className="mt-5">
+            <p className="kicker">Sectors most exposed</p>
+            <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink">
+              {selected.criticalInfrastructureSectors.map((s) => (
+                <li key={s} className="before:mr-2 before:text-ink-4 before:content-['-']">
+                  {s}
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
+        </section>
       </div>
 
-      {/* Country News Feed */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-border">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-ocean">
-            Live Stream: {selectedCountry.name}
-          </h3>
-          <span className="text-xs text-slate-muted">
-            {countryArticles.length} verified reports
+      {/* Coverage */}
+      <section aria-label={`Coverage: ${selected.name}`} className="mt-16">
+        <div className="section-head">
+          <h2 className="section-title">Latest from {selected.name}</h2>
+          <span className="text-xs font-medium text-ink-3 tabular">
+            {loading ? "Loading…" : `${articles.length} ${articles.length === 1 ? "story" : "stories"}`}
           </span>
         </div>
 
-        {loading && <LoadingSkeleton />}
+        {loading && <LoadingSkeleton rows={3} />}
 
-        {!loading && countryArticles.length === 0 && (
-          <div className="p-8 text-center bg-white rounded-2xl border border-slate-border">
-            <p className="text-xs text-slate-muted">
-              No active alerts specific to {selectedCountry.name} logged in this hourly cycle.
+        {!loading && articles.length === 0 && (
+          <div className="border-t border-rule py-10">
+            <p className="font-serif text-xl text-ink">No recent stories about {selected.name}.</p>
+            <p className="mt-2 max-w-prose text-ink-2">
+              {isFollowing
+                ? "You're following this country, so new stories will show under Following on the front page."
+                : "Follow this country to collect its stories under Following on the front page."}
             </p>
           </div>
         )}
 
-        {!loading && countryArticles.length > 0 && (
-          <div className="space-y-4">
-            {countryArticles.map((article) => (
-              <NewsCard key={article.id} article={article} />
+        {!loading && articles.length > 0 && (
+          <div className="border-b border-rule">
+            {articles.map((a) => (
+              <NewsCard key={a.id} article={a} />
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

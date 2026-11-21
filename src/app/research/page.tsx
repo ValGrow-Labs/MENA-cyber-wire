@@ -1,130 +1,124 @@
-import { Terminal, Shield, ExternalLink, ArrowRight } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Research" };
+
+const ACTORS = [
+  {
+    name: "MuddyWater",
+    aliases: "Mango Sandstorm, Seedworm, Static Kitten, MERCURY",
+    origin: "Iranian state",
+    targets:
+      "Government and private-sector organisations in telecoms, defence, local government and oil and gas, in the Middle East and beyond.",
+    techniques:
+      "Spear-phishing, exploitation of publicly known vulnerabilities, open-source tools and legitimate remote-administration software. Malware families named in public reporting include POWERSTATS, PowGoop and Small Sieve.",
+    activity:
+      "In January 2022 US Cyber Command identified MuddyWater as a subordinate element of Iran's Ministry of Intelligence and Security (MOIS). A joint advisory from CISA, the FBI, US Cyber Command's Cyber National Mission Force and the UK's NCSC followed in February 2022 (AA22-055A).",
+  },
+  {
+    name: "OilRig",
+    aliases: "APT34, Helix Kitten, Hazel Sandstorm",
+    origin: "Iran-linked",
+    targets:
+      "Government, financial, energy, chemical and telecoms organisations, mostly in the Middle East; publicly tracked since at least 2014.",
+    techniques:
+      "Spear-phishing and social engineering, including fake recruiter approaches on LinkedIn reported in 2019; custom backdoors that use DNS for command and control, and web shells on internet-facing servers.",
+    activity:
+      "In 2019 a Telegram channel leaked what it said were OilRig tools, server details and victim data, giving researchers an unusually detailed view of the group's operations.",
+  },
+  {
+    name: "Shamoon (Disttrack) operators",
+    aliases: "Wiper campaigns of 2012, 2016-17 and 2018",
+    origin: "Widely attributed to Iran-linked operators",
+    targets: "Energy companies and government agencies, chiefly in Saudi Arabia.",
+    techniques:
+      "Destructive malware that overwrites files and the master boot record, rendering machines unbootable. Each wave spread internally using stolen credentials.",
+    activity:
+      "In August 2012 Shamoon wiped around 30,000 workstations at Saudi Aramco. New variants hit Saudi government organisations in late 2016 and early 2017, and the Italian oil services company Saipem, including its Middle East operations, in December 2018.",
+  },
+  {
+    name: "TRITON / TRISIS",
+    aliases: "Operators tracked as XENOTIME by Dragos",
+    origin: "Linked by FireEye and the US Treasury to a Russian state research institute",
+    targets: "Safety instrumented systems in industrial plants.",
+    techniques:
+      "Malware built to reprogram Schneider Electric Triconex safety controllers, the systems that shut a plant down safely when conditions become dangerous.",
+    activity:
+      "Discovered in 2017 at a petrochemical facility in Saudi Arabia after it tripped a safety shutdown. In October 2020 the US Treasury sanctioned Russia's Central Scientific Research Institute of Chemistry and Mechanics (TsNIIKhM) over its role.",
+  },
+];
+
+const IN_PROGRESS = [
+  {
+    kind: "Planned · OT / ICS",
+    title: "What TRITON changed for safety systems at Gulf industrial plants",
+    dek: "A look at how operators separate safety controllers from control and corporate networks. Not yet published.",
+  },
+  {
+    kind: "Planned · Regulation",
+    title: "A side-by-side guide to data protection laws across the GCC, Egypt and Morocco",
+    dek: "Scope, breach notification and cross-border transfer rules, with links to the official texts. Not yet published.",
+  },
+];
 
 export default function ResearchPage() {
-  const threatActors = [
-    {
-      name: "MuddyWater (Mango Sandstorm / Seedworm)",
-      origin: "State-Aligned",
-      targets: "Government ministries, telecommunications, and financial institutions in Saudi Arabia, UAE, and Qatar.",
-      techniques: "Spear-phishing with weaponized macro docs, PowerShell backdoors (POWERSTATS), living-off-the-land binaries.",
-      activeCampaign: "Campaign spoofing GCC central banks compliance memos (March-May 2024).",
-    },
-    {
-      name: "OilRig (Cobalt Gypsy / APT34)",
-      origin: "State-Sponsored",
-      targets: "Petrochemicals, aviation, and energy logistics across the Gulf Cooperation Council.",
-      techniques: "DNS tunneling, LinkedIn social engineering, custom Web shells (RGDoor), side-loading DLLs.",
-      activeCampaign: "Targeting maritime supply chain contractors in the Persian Gulf.",
-    },
-    {
-      name: "LockBit 3.0 GCC Affiliates",
-      origin: "Organized Cybercrime Syndicate",
-      targets: "Regional retail chains, private healthcare groups, and construction conglomerates.",
-      techniques: "Double-extortion via leaked credentials, PsExec lateral propagation, StealBit exfiltration tool.",
-      activeCampaign: "Exploiting unpatched edge firewalls lacking MFA for initial ingress.",
-    },
-    {
-      name: "DarkBit",
-      origin: "Hacktivist / Ransomware",
-      targets: "Technology service providers, educational institutions, and municipalities in the Levant.",
-      techniques: "Rust-compiled multi-platform encryptors targeting Windows Active Directory and VMware ESXi.",
-      activeCampaign: "Focus on virtual machine hypervisor encryption.",
-    },
-  ];
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-border shadow-coastal-card">
-        <div className="flex items-center gap-2 mb-1">
-          <Terminal className="w-5 h-5 text-teal" />
-          <span className="text-xs font-bold uppercase tracking-wider text-teal">
-            Threat Intelligence & Research
-          </span>
-        </div>
-        <h1 className="text-xl sm:text-3xl font-extrabold font-serif text-ocean">
-          Regional Adversary Profiles & DFIR Research
-        </h1>
-        <p className="text-xs text-slate-muted max-w-2xl mt-1 leading-relaxed">
-          Comprehensive behavioral profiles, MITRE ATT&CK tactics, and indicators of compromise (IOCs) tracking threat groups targeting the MENA perimeter.
+    <div className="space-y-14">
+      <header>
+        <p className="kicker">Research</p>
+        <h1 className="mt-2 font-serif text-4xl font-semibold tracking-[-0.02em] text-ink sm:text-5xl">Groups behind major attacks on the region</h1>
+        <p className="mt-3 max-w-prose font-serif text-lg text-ink-2">
+          Profiles built only from public reporting by governments and security researchers. We list what is on the record, not speculation.
         </p>
-      </div>
+      </header>
 
-      {/* Adversary Profiles Grid */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-ocean flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-teal" />
-          Monitored Threat Actors Active in MENA
-        </h2>
+      <section aria-labelledby="actors">
+        <div className="section-head">
+          <h2 id="actors" className="section-title">Threat actor profiles</h2>
+          <span className="text-xs font-medium text-ink-3 tabular">{ACTORS.length} groups</span>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {threatActors.map((actor) => (
-            <div
-              key={actor.name}
-              className="p-5 rounded-2xl bg-white border border-slate-border hover:border-teal/40 hover:shadow-coastal transition-all space-y-3"
-            >
-              <div className="flex items-start justify-between gap-2 pb-2 border-b border-slate-border">
-                <div>
-                  <h3 className="text-base font-bold text-ocean">
-                    {actor.name}
-                  </h3>
-                  <span className="text-[11px] font-mono text-teal font-semibold">
-                    Classification: {actor.origin}
-                  </span>
-                </div>
+        <div>
+          {ACTORS.map((a, i) => (
+            <article key={a.name} className="grid gap-x-8 gap-y-3 border-t border-rule py-7 first:border-t-0 md:grid-cols-12">
+              <div className="md:col-span-4">
+                <span className="font-mono text-2xs text-ink-3 tabular">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-1 font-serif text-2xl font-semibold tracking-tight text-ink">{a.name}</h3>
+                <p className="mt-1 text-sm text-ink-3">{a.aliases}</p>
+                <p className="tag mt-3 border border-edge px-1.5 py-0.5 text-ink">{a.origin}</p>
               </div>
-
-              <div className="text-xs space-y-2 text-slate-dark">
+              <dl className="space-y-4 text-[0.9375rem] leading-relaxed md:col-span-8">
                 <div>
-                  <strong className="text-ocean">Target Profile: </strong>
-                  {actor.targets}
+                  <dt className="kicker">Targets</dt>
+                  <dd className="mt-1 text-ink-2">{a.targets}</dd>
                 </div>
                 <div>
-                  <strong className="text-ocean">Primary TTPs: </strong>
-                  {actor.techniques}
+                  <dt className="kicker">Techniques</dt>
+                  <dd className="mt-1 text-ink-2">{a.techniques}</dd>
                 </div>
-                <div className="p-2.5 rounded-xl bg-mist border border-mist-border text-[11px]">
-                  <strong className="text-alert-orange">Current Active Watch: </strong>
-                  {actor.activeCampaign}
+                <div className="border-l-2 border-edge pl-4">
+                  <dt className="kicker text-ink">On the record</dt>
+                  <dd className="mt-1 text-ink">{a.activity}</dd>
                 </div>
-              </div>
-            </div>
+              </dl>
+            </article>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Research Papers Spotlight */}
-      <div className="p-6 bg-white rounded-2xl border border-slate-border shadow-coastal-card space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-ocean">
-          Editorial Research Publications
-        </h2>
-
-        <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-ice border border-slate-border space-y-1.5">
-            <span className="text-[10px] font-mono uppercase text-teal font-bold">
-              Whitepaper &middot; OT/ICS Defense
-            </span>
-            <h4 className="text-sm font-bold text-ocean">
-              Securing Gulf Maritime Loading Telemetry: Air-Gapping SCADA Systems Under Modern Attack Vectors
-            </h4>
-            <p className="text-xs text-slate-dark leading-relaxed">
-              A technical blueprint for petroleum and LNG terminal operators implementing data diodes and hardware-enforced unidirectional gateways.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-ice border border-slate-border space-y-1.5">
-            <span className="text-[10px] font-mono uppercase text-teal font-bold">
-              Special Report &middot; Cloud Sovereignty
-            </span>
-            <h4 className="text-sm font-bold text-ocean">
-              Implementing NCA ECC-1:2018 in Sovereign Hyperscaler Regions (Riyadh & Abu Dhabi)
-            </h4>
-            <p className="text-xs text-slate-dark leading-relaxed">
-              Practical controls mapping for zero-trust architectures, HSM key custody, and telemetry retention within national borders.
-            </p>
-          </div>
+      <section aria-labelledby="forthcoming">
+        <div className="section-head">
+          <h2 id="forthcoming" className="section-title">Planned research</h2>
         </div>
-      </div>
+        <ul>
+          {IN_PROGRESS.map((r) => (
+            <li key={r.title} className="border-t border-rule py-5 first:border-t-0">
+              <p className="kicker">{r.kind}</p>
+              <h3 className="mt-1.5 font-serif text-xl font-semibold leading-snug text-ink">{r.title}</h3>
+              <p className="mt-1.5 text-ink-2">{r.dek}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

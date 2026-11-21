@@ -1,6 +1,12 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * MENA Cyber Wire — professional light system
+ * Token names are semantic: paper = background surfaces, ink = foreground text,
+ * edge = structural dividers, signal = the single accent (ember), reserved for urgency.
+ */
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,56 +14,77 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // All colours are CSS variables (see globals.css) so light and dark themes swap in one place.
       colors: {
-        ice: "#F7FAFC", // Primary background
-        teal: {
-          DEFAULT: "#087E8B", // Primary brand
-          dark: "#066873",
-          light: "#EBF6F7",
-          border: "#B4DFE3",
-        },
-        ocean: {
-          DEFAULT: "#183B56", // Secondary brand / headings
-          dark: "#102A3E",
-          light: "#EDF2F7",
-          surface: "#F4F7FA",
-        },
-        amber: {
-          desert: "#F2B45B", // Accent / highlights
-          light: "#FEF7ED",
-          dark: "#C68832",
-          border: "#FAD9A6",
-        },
-        mist: {
-          DEFAULT: "#E5F2F5", // Secondary surface
-          light: "#F0F7F9",
-          dark: "#D0E4EA",
-          border: "#C8DFE6",
-        },
-        alert: {
-          orange: "#E45B48", // Breaking / critical
-          light: "#FDF2F0",
-          border: "#F6BEB7",
-          dark: "#C33F2E",
-        },
-        slate: {
-          dark: "#1D2939", // Text
-          muted: "#68788A", // Secondary text
-          border: "#DCE6EC", // Border
-          subtle: "#F1F5F8",
-        },
+        paper: { DEFAULT: "rgb(var(--paper) / <alpha-value>)", raised: "rgb(var(--paper-raised) / <alpha-value>)", sunk: "rgb(var(--paper-sunk) / <alpha-value>)" },
+        ink: { DEFAULT: "rgb(var(--ink) / <alpha-value>)", 2: "rgb(var(--ink-2) / <alpha-value>)", 3: "rgb(var(--ink-3) / <alpha-value>)", 4: "rgb(var(--ink-4) / <alpha-value>)" },
+        rule: { DEFAULT: "rgb(var(--rule) / <alpha-value>)", strong: "rgb(var(--ink) / <alpha-value>)" },
+        edge: "rgb(var(--edge) / <alpha-value>)",
+        brand: { DEFAULT: "rgb(var(--brand) / <alpha-value>)", dark: "rgb(var(--brand-dark) / <alpha-value>)", navy: "rgb(var(--brand-navy) / <alpha-value>)", wash: "rgb(var(--brand-wash) / <alpha-value>)" },
+        signal: { DEFAULT: "rgb(var(--signal) / <alpha-value>)", deep: "rgb(var(--signal-deep) / <alpha-value>)", wash: "rgb(var(--signal-wash) / <alpha-value>)" },
+        caution: "rgb(var(--caution) / <alpha-value>)",
+        medium: "rgb(var(--medium) / <alpha-value>)",
+        safe: "rgb(var(--safe) / <alpha-value>)",
       },
       fontFamily: {
-        heading: ["'Plus Jakarta Sans'", "'Manrope'", "system-ui", "sans-serif"],
-        body: ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        serif: ["'Newsreader'", "'Source Serif 4'", "Georgia", "serif"],
-        mono: ["'JetBrains Mono'", "Courier New", "monospace"],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        // "serif" kept as an alias of the display face so older classes stay valid. No serif in the system.
+        serif: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
-      boxShadow: {
-        coastal: "0 1px 3px rgba(24, 59, 86, 0.05), 0 4px 12px rgba(8, 126, 139, 0.03)",
-        "coastal-card": "0 2px 8px rgba(24, 59, 86, 0.04), 0 1px 2px rgba(24, 59, 86, 0.02)",
-        "coastal-hover": "0 6px 20px rgba(8, 126, 139, 0.08), 0 2px 6px rgba(24, 59, 86, 0.04)",
-        "coastal-elevated": "0 12px 32px rgba(24, 59, 86, 0.08)",
+      // Shape lock: pills for buttons, 12px for media and panels, 10px for inputs.
+      borderRadius: {
+        // Square photos and panels, as on major news sites; buttons stay pill-shaped.
+        md: "3px",
+        lg: "4px",
+        xl: "0px",
+        "2xl": "0px",
+      },
+      fontSize: {
+        "2xs": ["0.6875rem", { lineHeight: "1rem" }],
+      },
+      letterSpacing: {
+        kicker: "0.14em",
+      },
+      maxWidth: {
+        page: "1680px",
+        prose: "68ch",
+      },
+      zIndex: {
+        rail: "10",
+        header: "30",
+        overlay: "40",
+        modal: "50",
+      },
+      keyframes: {
+        rise: {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        blink: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.25" },
+        },
+        sweep: {
+          to: { transform: "rotate(360deg)" },
+        },
+        ring: {
+          "0%": { transform: "scale(0.4)", opacity: "0.9" },
+          "100%": { transform: "scale(2.6)", opacity: "0" },
+        },
+        marquee: {
+          to: { transform: "translateX(-50%)" },
+        },
+      },
+      transitionTimingFunction: {
+        spring: "cubic-bezier(0.32, 0.72, 0, 1)",
+      },
+      animation: {
+        rise: "rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both",
+        blink: "blink 1.6s ease-in-out infinite",
+        sweep: "sweep 9s linear infinite",
+        ring: "ring 2.6s cubic-bezier(0.32, 0.72, 0, 1) infinite",
+        marquee: "marquee 60s linear infinite",
       },
     },
   },

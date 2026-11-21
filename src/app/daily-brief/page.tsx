@@ -1,19 +1,45 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTodayCyberPulse } from "@/lib/threat/cyber-pulse";
-import { CyberPulseSummary } from "@/types/threat";
-import { NewsArticle } from "@/types/news";
-import { CVEItem } from "@/types/threat";
-import { 
-  BookOpen, 
-  Calendar, 
-  CheckCircle2, 
-  ExternalLink, 
-  ArrowRight,
-  Printer
-} from "lucide-react";
 import Link from "next/link";
+import { getTodayCyberPulse } from "@/lib/threat/cyber-pulse";
+import { CyberPulseSummary, CVEItem } from "@/types/threat";
+import { NewsArticle } from "@/types/news";
+
+const ACTIONS = [
+  "Check perimeter gateways (PAN-OS, Ivanti, Fortinet) against the current KEV list and patch anything listed.",
+  "Warn finance teams about phishing that imitates GCC regulator memos; MuddyWater has used this lure repeatedly.",
+  "Confirm offline backups exist and restore cleanly for OT historian and SCADA servers.",
+  "Require hardware-key or app-based MFA on every administrative portal, including vendor access.",
+];
+
+function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <section className="grid gap-x-6 border-t-2 border-edge pt-4 sm:grid-cols-[3.5rem_1fr]">
+      <span className="font-mono text-2xl leading-none text-ink-4 tabular" aria-hidden>
+        {String(n).padStart(2, "0")}
+      </span>
+      <div className="min-w-0">
+        <h2 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-ink sm:mt-0">{title}</h2>
+        <div className="mt-4">{children}</div>
+      </div>
+    </section>
+  );
+}
+
+function RowSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="animate-pulse" aria-hidden>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="space-y-2 border-t border-rule py-4">
+          <div className="h-3 w-32 bg-paper-sunk" />
+          <div className="h-5 w-11/12 bg-paper-sunk" />
+          <div className="h-3 w-3/4 bg-paper-sunk" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function DailyBriefPage() {
   const [pulse, setPulse] = useState<CyberPulseSummary | null>(null);
@@ -23,214 +49,137 @@ export default function DailyBriefPage() {
 
   useEffect(() => {
     setPulse(getTodayCyberPulse());
-
     Promise.all([
-      fetch("/api/news?status=SIGNAL&sortBy=latest").then((r) => r.json()),
+      fetch("/api/news?sortBy=latest").then((r) => r.json()),
       fetch("/api/vulnerabilities?severity=CRITICAL").then((r) => r.json()),
     ])
       .then(([newsData, cveData]) => {
-        if (newsData.data) setTopStories(newsData.data.slice(0, 5));
-        if (cveData.data) setTopCves(cveData.data.slice(0, 3));
+        if (Array.isArray(newsData?.data)) setTopStories(newsData.data.slice(0, 5));
+        if (Array.isArray(cveData?.data)) setTopCves(cveData.data.slice(0, 3));
       })
-      .catch((err) => console.warn(err))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* Editorial Header (Coastal Tech Ocean Blue & Deep Teal) */}
-      <div className="p-6 rounded-2xl bg-ocean text-white shadow-coastal-elevated">
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/15">
-          <div>
-            <div className="flex items-center gap-2 mb-1 text-amber-desert">
-              <BookOpen className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">
-                Morning Intelligence Brief
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-white">
-              MENA Daily Cyber Brief
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 text-mist font-mono border border-white/20">
-              <Calendar className="w-3.5 h-3.5 text-amber-desert" />
-              <span>{pulse?.date}</span>
-            </span>
-            <button
-              onClick={() => window.print()}
-              className="p-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors"
-              title="Print Brief"
-            >
-              <Printer className="w-4 h-4" />
-            </button>
-          </div>
+    <article className="max-w-[46rem]">
+      <header className="pb-6">
+        <p className="kicker">Daily brief · {pulse?.date ?? " "}</p>
+        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-[-0.02em] text-ink sm:text-5xl">
+          The morning brief
+        </h1>
+        <p className="mt-3 max-w-prose font-serif text-lg text-ink-2">
+          What security teams in the region should know before the first meeting of the day.
+        </p>
+        <div className="mt-5 flex gap-5 text-xs font-medium text-ink-3">
+          <button onClick={() => window.print()} className="hover:text-ink">
+            Print
+          </button>
+          <Link href="/breaking" className="hover:text-ink">
+            Full wire →
+          </Link>
         </div>
+      </header>
 
-        {/* Executive Threat Posture */}
+      <div className="space-y-14">
         {pulse && (
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div className="p-3.5 rounded-xl bg-white/10 border border-white/15">
-              <span className="text-mist-light block mb-1">Threat Posture</span>
-              <span className="text-base font-extrabold text-amber-desert font-mono">
-                DEFCON: {pulse.threatLevel}
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-white/10 border border-white/15">
-              <span className="text-mist-light block mb-1">Active Intrusions</span>
-              <span className="text-base font-extrabold text-white font-mono">
-                {pulse.activeIncidentsCount} High-Severity Incidents
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-white/10 border border-white/15">
-              <span className="text-mist-light block mb-1">Target Sectors</span>
-              <span className="text-xs font-semibold text-white">
-                {pulse.targetedSectors.join(", ")}
-              </span>
-            </div>
-          </div>
+          <Section n={1} title="The short version">
+            <p className="font-serif text-xl leading-relaxed text-ink first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-[3.4rem] first-letter:font-semibold first-letter:leading-[0.85]">
+              {pulse.keyTakeaway}
+            </p>
+            <dl className="mt-6 grid border-y border-rule text-sm sm:grid-cols-2">
+              <div className="py-3 sm:pr-4">
+                <dt className="kicker">Sectors in focus</dt>
+                <dd className="mt-1.5 text-ink">{pulse.targetedSectors.join(", ")}</dd>
+              </div>
+              <div className="border-t border-rule py-3 sm:border-l sm:border-t-0 sm:pl-4">
+                <dt className="kicker">Groups we&apos;re tracking</dt>
+                <dd className="mt-1.5 text-ink">{pulse.primaryThreatActors.join(", ")}</dd>
+              </div>
+            </dl>
+          </Section>
         )}
-      </div>
 
-      {/* Section 1: Executive Summary */}
-      {pulse && (
-        <section className="p-6 bg-white rounded-2xl border border-slate-border shadow-coastal-card space-y-3">
-          <div className="flex items-center gap-2 pb-2 border-b border-slate-border">
-            <span className="w-2.5 h-2.5 rounded-full bg-teal" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-ocean">
-              1. Executive Intelligence Overview
-            </h2>
-          </div>
-          <p className="text-sm text-slate-dark leading-relaxed">
-            {pulse.keyTakeaway}
-          </p>
-        </section>
-      )}
+        <Section n={2} title="On the wire">
+          {loading ? (
+            <RowSkeleton rows={4} />
+          ) : topStories.length === 0 ? (
+            <p className="text-ink-3">No stories came through the feed this morning.</p>
+          ) : (
+            <ol className="border-b border-rule">
+              {topStories.map((s, i) => (
+                <li key={s.id} className="grid grid-cols-[1.75rem_1fr] gap-x-3 border-t border-rule py-5">
+                  <span className="font-mono text-sm text-ink-3 tabular">{i + 1}.</span>
+                  <div className="min-w-0">
+                    <p className="kicker flex flex-wrap gap-x-3">
+                      {s.country && <span>{s.country}</span>}
+                      <span>{s.category}</span>
+                      <span className="normal-case tracking-normal">{s.sourceName}</span>
+                    </p>
+                    <Link href={`/article/${s.id}`} className="group">
+                      <h3 className="mt-1.5 font-serif text-xl font-semibold leading-snug text-ink decoration-1 underline-offset-[5px] group-hover:underline">
+                        {s.title}
+                      </h3>
+                    </Link>
+                    <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-2">{s.description}</p>
+                    {s.threatToAction && (
+                      <p className="mt-3 border-l-2 border-edge pl-3 text-sm leading-relaxed text-ink">
+                        <span className="kicker mr-2 text-ink">What to do</span>
+                        {s.threatToAction.whatShouldUsersDo}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </Section>
 
-      {/* Section 2: Top 5 Regional Stories */}
-      <section className="p-6 bg-white rounded-2xl border border-slate-border shadow-coastal-card space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-slate-border">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-desert" />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-ocean">
-            2. Top Verified Regional Incidents
-          </h2>
-        </div>
-
-        <div className="space-y-4">
-          {topStories.map((story, i) => (
-            <div
-              key={story.id}
-              className="p-4 rounded-xl bg-ice border border-slate-border space-y-2"
-            >
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-teal">#{i + 1}</span>
-                  {story.country && (
-                    <span className="font-bold text-ocean">
-                      [{story.country}]
+        <Section n={3} title="Patch first">
+          {loading ? (
+            <RowSkeleton />
+          ) : topCves.length === 0 ? (
+            <p className="text-ink-3">NVD returned no critical records this morning.</p>
+          ) : (
+            <ul className="border-b border-rule">
+              {topCves.map((cve) => (
+                <li key={cve.id} className="border-t border-rule py-4">
+                  <a href={cve.sourceUrl} target="_blank" rel="noopener noreferrer" className="group block">
+                    <span className="flex items-baseline justify-between gap-4 font-mono text-sm">
+                      <span className="text-ink group-hover:underline group-hover:underline-offset-4">{cve.id}</span>
+                      <span className="text-2xs uppercase tracking-wider text-signal tabular">
+                        CVSS {cve.cvssScore.toFixed(1)}
+                      </span>
                     </span>
-                  )}
-                  <span className="text-slate-muted">&middot; {story.category}</span>
-                </div>
-                <span className="text-[11px] text-slate-muted">
-                  {story.sourceName}
-                </span>
-              </div>
+                    <span className="mt-1.5 block text-[0.9375rem] leading-relaxed text-ink-2 line-clamp-2">
+                      {cve.description}
+                    </span>
+                    {cve.isExploitedInWild && (
+                      <span className="mt-1.5 block text-xs font-medium text-signal">
+                        Known exploited
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Link href="/threats" className="link mt-4 inline-block text-sm text-ink">
+            All vulnerabilities →
+          </Link>
+        </Section>
 
-              <Link href={`/article/${story.id}`}>
-                <h3 className="text-sm sm:text-base font-bold text-ocean hover:text-teal transition-colors leading-snug">
-                  {story.title}
-                </h3>
-              </Link>
-
-              <p className="text-xs text-slate-dark leading-relaxed">
-                {story.description}
-              </p>
-
-              {story.threatToAction && (
-                <div className="mt-2 text-xs font-medium text-slate-dark bg-white p-2.5 rounded-lg border border-slate-border">
-                  <strong className="text-teal">Defensive Takeaway: </strong>
-                  {story.threatToAction.whatShouldUsersDo}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Section 3: Critical CVEs of the Day */}
-      <section className="p-6 bg-white rounded-2xl border border-slate-border shadow-coastal-card space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-slate-border">
-          <span className="w-2.5 h-2.5 rounded-full bg-alert-orange" />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-ocean">
-            3. Priority Vulnerabilities Requiring Immediate Action
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {topCves.map((cve) => (
-            <div
-              key={cve.id}
-              className="p-3.5 rounded-xl bg-ice border border-slate-border flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-xs font-bold text-ocean">
-                    {cve.id}
-                  </span>
-                  <span className="px-1.5 py-0.5 text-[9px] font-bold rounded-md bg-alert-light text-alert-orange border border-alert-border">
-                    {cve.cvssScore}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-dark line-clamp-2 mb-2">
-                  {cve.description}
-                </p>
-              </div>
-              <a
-                href={cve.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-bold text-teal hover:underline flex items-center gap-1 mt-2"
-              >
-                <span>NVD Advisory</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Section 4: Recommended SOC & IT Actions */}
-      <section className="p-6 bg-white rounded-2xl border border-slate-border shadow-coastal-card space-y-3">
-        <div className="flex items-center gap-2 pb-2 border-b border-slate-border">
-          <span className="w-2.5 h-2.5 rounded-full bg-teal" />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-ocean">
-            4. Recommended Actions for MENA IT & Security Teams
-          </h2>
-        </div>
-
-        <ul className="space-y-2 text-xs sm:text-sm text-slate-dark">
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 text-teal flex-shrink-0 mt-0.5" />
-            <span>Audit perimeter gateway appliances (PAN-OS, Ivanti, Fortinet) against active CVE listings.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 text-teal flex-shrink-0 mt-0.5" />
-            <span>Alert finance officers to ongoing MuddyWater phishing campaigns mimicking GCC regulatory memos.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 text-teal flex-shrink-0 mt-0.5" />
-            <span>Verify air-gapped backup schedules for OT/SCADA telemetry historian nodes in industrial sectors.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 text-teal flex-shrink-0 mt-0.5" />
-            <span>Enforce biometric or hardware token multi-factor authentication on all administrative portals.</span>
-          </li>
-        </ul>
-      </section>
-    </div>
+        <Section n={4} title="This week's checklist">
+          <ol className="space-y-3">
+            {ACTIONS.map((a, i) => (
+              <li key={i} className="flex gap-3 text-[0.9375rem] leading-relaxed text-ink-2">
+                <span className="font-mono text-2xs leading-6 text-ink-3 tabular">{String(i + 1).padStart(2, "0")}</span>
+                <span>{a}</span>
+              </li>
+            ))}
+          </ol>
+        </Section>
+      </div>
+    </article>
   );
 }

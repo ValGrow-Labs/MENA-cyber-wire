@@ -5,29 +5,29 @@ interface Props {
   size?: "sm" | "md";
 }
 
+/**
+ * Severity as a 4-step bar meter + label. Only Critical uses the signal colour.
+ */
 export default function ThreatSeverityBadge({ severity, size = "md" }: Props) {
-  // Coastal Tech severity tokens:
-  // Critical: Alert Orange
-  // High: Desert Amber
-  // Medium: Ocean Blue
-  // Low: Muted Slate
-  const styles: Record<ThreatSeverity, string> = {
-    Critical: "bg-alert-light text-alert-orange border-alert-border font-bold",
-    High: "bg-amber-light text-amber-dark border-amber-border font-semibold",
-    Medium: "bg-mist text-ocean border-mist-border font-semibold",
-    Low: "bg-slate-subtle text-slate-muted border-slate-border font-medium",
-  };
-
-  const sizes = {
-    sm: "px-2 py-0.5 text-[9px] tracking-wide",
-    md: "px-2.5 py-0.5 text-[10px] tracking-wider",
-  };
+  const levels: Record<ThreatSeverity, number> = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+  const level = levels[severity] ?? 2;
+  const isCritical = severity === "Critical";
 
   return (
     <span
-      className={`inline-flex items-center uppercase rounded-md border ${styles[severity] || styles.Medium} ${sizes[size]}`}
+      className={`tag ${isCritical ? "text-signal" : severity === "High" ? "text-caution" : "text-ink-3"}`}
+      title={`Severity: ${severity}`}
     >
-      {severity}
+      <span className="flex items-end gap-[2px]" aria-hidden>
+        {[1, 2, 3, 4].map((i) => (
+          <span
+            key={i}
+            className={`w-[3px] ${i <= level ? "bg-current" : "bg-rule"}`}
+            style={{ height: `${(size === "sm" ? 3 : 4) + i * 2}px` }}
+          />
+        ))}
+      </span>
+      <span>{severity}</span>
     </span>
   );
 }

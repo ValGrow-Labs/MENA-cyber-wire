@@ -10,6 +10,10 @@ export interface CVEItem {
   sourceUrl: string;
   isExploitedInWild?: boolean;
   menaImpactNote?: string;
+  /** Date CISA added it to the Known Exploited Vulnerabilities catalogue (YYYY-MM-DD). */
+  kevAddedDate?: string;
+  /** CISA's plain-language name for the vulnerability. */
+  kevName?: string;
 }
 
 export interface CISAAdvisory {

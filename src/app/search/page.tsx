@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import NewsCard from "@/components/news/NewsCard";
 import CVECard from "@/components/threat/CVECard";
 import LoadingSkeleton from "@/components/shared/LoadingSkeleton";
 import { NewsArticle } from "@/types/news";
 import { CVEItem } from "@/types/threat";
-import { Search, Clock } from "lucide-react";
 import { LocalStore } from "@/lib/storage/local-store";
 
+const SUGGESTED = ["Saudi Arabia", "Ransomware UAE", "CVE-2024-3400", "OT/SCADA", "MuddyWater", "NCA ECC"];
+
 function SearchPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("q") || "";
 
@@ -19,6 +21,7 @@ function SearchPageContent() {
   const [newsResults, setNewsResults] = useState<NewsArticle[]>([]);
   const [cveResults, setCveResults] = useState<CVEItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
@@ -28,6 +31,7 @@ function SearchPageContent() {
   const runSearch = async (term: string) => {
     if (!term.trim()) return;
     setLoading(true);
+    setFailed(false);
     LocalStore.addSearchHistory(term.trim());
     setRecentSearches(LocalStore.getSearchHistory());
 
@@ -36,14 +40,12 @@ function SearchPageContent() {
         fetch(`/api/news?search=${encodeURIComponent(term)}`),
         fetch(`/api/vulnerabilities?search=${encodeURIComponent(term)}`),
       ]);
-
       const nData = await nRes.json();
       const cData = await cRes.json();
-
       setNewsResults(nData.data || []);
       setCveResults(cData.data || []);
-    } catch (err) {
-      console.warn("Search error:", err);
+    } catch {
+      setFailed(true);
     } finally {
       setLoading(false);
     }
@@ -52,174 +54,165 @@ function SearchPageContent() {
   useEffect(() => {
     if (queryParam) {
       setQuery(queryParam);
+      setActiveTab("all");
       runSearch(queryParam);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParam]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    runSearch(query);
+  // Drive searches through the URL so results are shareable and the back button works.
+  const go = (term: string) => {
+    const t = term.trim();
+    if (!t) return;
+    setQuery(t);
+    if (t === queryParam) runSearch(t);
+    else router.push(`/search?q=${encodeURIComponent(t)}`);
   };
 
-  const handleTagClick = (tag: string) => {
-    setQuery(tag);
-    runSearch(tag);
-  };
-
-  const totalResults = newsResults.length + cveResults.length;
+  const total = newsResults.length + cveResults.length;
+  const tabs = [
+    { id: "all" as const, label: "All", count: total },
+    { id: "news" as const, label: "Stories", count: newsResults.length },
+    { id: "cve" as const, label: "CVEs", count: cveResults.length },
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Search Header Banner */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-border shadow-coastal-card">
-        <h1 className="text-xl sm:text-2xl font-bold font-heading text-ocean mb-1.5">
-          Global Threat Intelligence Search
-        </h1>
-        <p className="text-xs text-slate-muted mb-4">
-          Query indexed MENA incidents, APT actor campaigns, NVD CVE records, and regional cyber regulations.
-        </p>
-
-        {/* Big Search Input */}
-        <form onSubmit={handleSubmit} className="relative flex items-center w-full">
-          <Search className="w-4 h-4 absolute left-3.5 text-slate-muted" />
+    <div className="space-y-10">
+      <header>
+        <p className="kicker">Search</p>
+        <form
+          role="search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            go(query);
+          }}
+          className="mt-3 flex items-end gap-4 border-b-2 border-edge"
+        >
+          <label htmlFor="q" className="sr-only">Search stories and CVEs</label>
           <input
-            type="text"
+            id="q"
+            type="search"
+            autoFocus={!queryParam}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search keywords (e.g. MuddyWater, Saudi Arabia, CVE-2024-3400, Ransomware, aeCERT)..."
-            className="w-full pl-10 pr-24 py-2.5 text-sm rounded-xl bg-ice border border-slate-border text-slate-dark placeholder-slate-muted focus:outline-hidden focus:border-teal"
+            placeholder="Search the wire"
+            className="min-w-0 flex-1 bg-transparent pb-2 font-serif text-4xl font-semibold tracking-[-0.02em] text-ink placeholder:font-normal placeholder:text-ink-4 focus:outline-none sm:text-5xl"
           />
-          <button
-            type="submit"
-            className="absolute right-2 px-4 py-1.5 text-xs font-bold rounded-lg bg-teal text-white hover:bg-teal-dark shadow-coastal"
-          >
-            Search
+          <button type="submit" className="mb-3 shrink-0 text-xs font-medium text-ink-3 hover:text-ink">
+            Search ↵
           </button>
         </form>
+        <p className="mt-3 max-w-prose font-serif text-lg text-ink-2">
+          Stories, CVE records and threat groups, by keyword, country or ID.
+        </p>
 
-        {/* Suggested Queries */}
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-slate-muted font-medium">Suggested:</span>
-          {["Saudi Arabia", "Ransomware UAE", "CVE-2024-3400", "OT/SCADA", "MuddyWater", "NCA ECC"].map((s) => (
-            <button
-              key={s}
-              onClick={() => handleTagClick(s)}
-              className="px-2.5 py-0.5 rounded-lg bg-mist text-ocean hover:bg-teal hover:text-white border border-mist-border text-[11px] font-semibold transition-colors"
-            >
+        <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium">
+          <span className="text-ink-4">Try</span>
+          {SUGGESTED.map((s) => (
+            <button key={s} onClick={() => go(s)} className="text-ink-3 hover:text-ink hover:underline hover:underline-offset-4">
               {s}
             </button>
           ))}
         </div>
-      </div>
+      </header>
 
-      {/* Recent Search History */}
       {recentSearches.length > 0 && !queryParam && (
-        <div className="p-4 bg-white rounded-2xl border border-slate-border shadow-coastal-card">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-border text-xs">
-            <span className="font-bold uppercase tracking-wider text-slate-muted">
-              Recent Queries
-            </span>
+        <section aria-label="Recent searches">
+          <div className="section-head">
+            <h2 className="section-title">Recent searches</h2>
             <button
               onClick={() => {
                 LocalStore.clearSearchHistory();
                 setRecentSearches([]);
               }}
-              className="text-teal hover:underline font-bold"
+              className="text-xs font-medium text-ink-3 hover:text-ink"
             >
               Clear
             </button>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <ul className="border-b border-rule">
             {recentSearches.map((term) => (
-              <button
-                key={term}
-                onClick={() => handleTagClick(term)}
-                className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-lg bg-ice text-ocean border border-slate-border hover:border-teal font-medium"
-              >
-                <Clock className="w-3 h-3 text-teal" />
-                <span>{term}</span>
-              </button>
+              <li key={term} className="border-t border-rule first:border-t-0">
+                <button onClick={() => go(term)} className="flex w-full items-center justify-between py-3 text-left text-ink-2 hover:text-ink">
+                  <span>{term}</span>
+                  <span className="text-ink-4" aria-hidden>→</span>
+                </button>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </section>
       )}
 
-      {/* Tabs */}
       {queryParam && (
-        <div className="flex items-center justify-between pb-2 border-b border-slate-border text-xs">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveTab("all")}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                activeTab === "all" ? "bg-teal text-white shadow-coastal" : "text-slate-dark hover:bg-mist"
-              }`}
-            >
-              All Matches ({totalResults})
-            </button>
-            <button
-              onClick={() => setActiveTab("news")}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                activeTab === "news" ? "bg-teal text-white shadow-coastal" : "text-slate-dark hover:bg-mist"
-              }`}
-            >
-              Intelligence Reports ({newsResults.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("cve")}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                activeTab === "cve" ? "bg-teal text-white shadow-coastal" : "text-slate-dark hover:bg-mist"
-              }`}
-            >
-              CVE Records ({cveResults.length})
-            </button>
+        <section aria-label="Results">
+          <div className="section-head items-end">
+            <div role="tablist" aria-label="Result type" className="-mb-3 flex gap-5">
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  role="tab"
+                  aria-selected={activeTab === t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className={`border-b-[3px] pb-2.5 font-serif text-lg transition-colors ${
+                    activeTab === t.id ? "border-signal text-ink" : "border-transparent text-ink-3 hover:text-ink"
+                  }`}
+                >
+                  {t.label} <span className="font-mono text-xs tabular">{loading ? "" : t.count}</span>
+                </button>
+              ))}
+            </div>
+            <span className="hidden truncate text-xs font-medium text-ink-3 sm:block">
+              “{queryParam}”
+            </span>
           </div>
 
-          <span className="text-slate-muted">
-            Results for &ldquo;{queryParam}&rdquo;
-          </span>
-        </div>
-      )}
+          <div className="mt-2">
+            {loading && <LoadingSkeleton rows={4} />}
 
-      {loading && <LoadingSkeleton />}
+            {!loading && failed && (
+              <div role="alert" className="border-l-2 border-signal bg-paper-raised px-5 py-5">
+                <p className="font-serif text-lg text-ink">The search didn&apos;t complete.</p>
+                <button onClick={() => runSearch(queryParam)} className="btn-quiet mt-4">Try again</button>
+              </div>
+            )}
 
-      {/* Results */}
-      {!loading && queryParam && (
-        <div className="space-y-4">
-          {totalResults === 0 ? (
-            <div className="p-12 text-center rounded-2xl bg-white border border-slate-border shadow-coastal-card">
-              <p className="text-sm font-bold text-ocean">
-                No threat intelligence matched &ldquo;{queryParam}&rdquo;.
-              </p>
-              <p className="text-xs text-slate-muted mt-1">
-                Try searching for a country name, CVE ID, threat actor, or attack vector.
-              </p>
-            </div>
-          ) : (
-            <>
-              {(activeTab === "all" || activeTab === "news") && newsResults.length > 0 && (
-                <div className="space-y-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-muted block">
-                    Intelligence Articles ({newsResults.length})
-                  </span>
-                  {newsResults.map((article) => (
-                    <NewsCard key={article.id} article={article} />
-                  ))}
-                </div>
-              )}
+            {!loading && !failed && total === 0 && (
+              <div className="border-t border-rule py-12">
+                <p className="font-serif text-2xl text-ink">Nothing found for “{queryParam}”.</p>
+                <p className="mt-2 max-w-prose text-ink-2">
+                  Try a country, a CVE ID such as CVE-2024-3400, a group name, or a broader word like ransomware.
+                </p>
+              </div>
+            )}
 
-              {(activeTab === "all" || activeTab === "cve") && cveResults.length > 0 && (
-                <div className="space-y-3 pt-4">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-muted block">
-                    CVE Records ({cveResults.length})
-                  </span>
-                  {cveResults.map((cve) => (
-                    <CVECard key={cve.id} cve={cve} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            {!loading && !failed && total > 0 && (
+              <div className="space-y-12">
+                {(activeTab === "all" || activeTab === "news") && newsResults.length > 0 && (
+                  <div>
+                    {activeTab === "all" && <p className="kicker mb-1 mt-4">Stories</p>}
+                    <div className="border-b border-rule">
+                      {newsResults.map((a) => <NewsCard key={a.id} article={a} />)}
+                    </div>
+                  </div>
+                )}
+                {(activeTab === "all" || activeTab === "cve") && cveResults.length > 0 && (
+                  <div>
+                    {activeTab === "all" && <p className="kicker mb-1 mt-4">CVE records</p>}
+                    <div>
+                      {cveResults.map((c) => <CVECard key={c.id} cve={c} />)}
+                    </div>
+                  </div>
+                )}
+                {activeTab === "news" && newsResults.length === 0 && (
+                  <p className="border-t border-rule py-8 text-ink-2">No stories match. Check the CVEs tab.</p>
+                )}
+                {activeTab === "cve" && cveResults.length === 0 && (
+                  <p className="border-t border-rule py-8 text-ink-2">No CVE records match. Check the Stories tab.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
       )}
     </div>
   );

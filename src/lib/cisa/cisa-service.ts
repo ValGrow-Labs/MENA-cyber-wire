@@ -69,7 +69,7 @@ export async function fetchCISAAdvisories(): Promise<CISAAdvisory[]> {
     const response = await fetch("https://www.cisa.gov/cybersecurity-advisories/all.xml", {
       signal: controller.signal,
       headers: {
-        "User-Agent": "MENA-Cyber-Wire-Platform/1.0",
+        "User-Agent": "Mozilla/5.0 (compatible; MENACyberWire/1.0; news reader)",
         "Accept": "application/rss+xml, text/xml, application/xml"
       },
       next: { revalidate: 1800 }
@@ -93,7 +93,7 @@ export async function fetchCISAAdvisories(): Promise<CISAAdvisory[]> {
       return FALLBACK_ADVISORIES;
     }
 
-    const liveAdvisories: CISAAdvisory[] = items.slice(0, 10).map((item: any, idx: number) => {
+    const liveAdvisories: CISAAdvisory[] = items.slice(0, 15).map((item: any, idx: number) => {
       const title = item.title?.replace(/<[^>]*>/g, "").trim() || "CISA Cybersecurity Advisory";
       const desc = item.description?.replace(/<[^>]*>/g, "").trim() || "Official advisory from Cybersecurity & Infrastructure Security Agency.";
       const link = item.link || "https://www.cisa.gov";
@@ -103,17 +103,20 @@ export async function fetchCISAAdvisories(): Promise<CISAAdvisory[]> {
         id: `CISA-${new Date(pubDate).getFullYear()}-${idx + 101}`,
         title,
         publishedDate: pubDate,
-        affectedProducts: ["Enterprise Systems", "Network Perimeter", "Cloud Identity"],
-        severity: title.toLowerCase().includes("critical") ? "Critical" : "High",
-        source: "CISA Official Feed",
+        // Only what the feed actually says: no invented product lists or remediation text.
+        affectedProducts: [],
+        severity: /critical/i.test(title) ? "Critical" : "Advisory",
+        source: /ics/i.test(String(link)) ? "CISA ICS" : "CISA",
         sourceUrl: link,
         summary: desc.length > 250 ? `${desc.slice(0, 250)}...` : desc,
-        remediationAction: "Apply vendor security updates and audit privileged account configurations according to CISA guidelines."
+        remediationAction: ""
       };
     });
 
-    const combined = [...FALLBACK_ADVISORIES, ...liveAdvisories];
-    const unique = Array.from(new Map(combined.map((a) => [a.title, a])).values());
+    // Live advisories only, newest first. The built-in set is used only when the feed is down.
+    const unique = Array.from(new Map(liveAdvisories.map((a) => [a.title, a])).values()).sort(
+      (a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
+    );
     cisaCache = { timestamp: now, data: unique };
     return unique;
 

@@ -2,71 +2,195 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-primary: #F7FAFC; /* Ice White */
-  --bg-surface: #FFFFFF; /* Pure White */
-  --bg-secondary: #E5F2F5; /* Mist Blue */
-  --text-primary: #1D2939; /* Dark Slate */
-  --text-secondary: #68788A; /* Muted Slate */
-  --brand-teal: #087E8B; /* Deep Teal */
-  --brand-ocean: #183B56; /* Ocean Blue */
-  --accent-amber: #F2B45B; /* Desert Amber */
-  --alert-orange: #E45B48; /* Alert Orange */
-  --border-subtle: #DCE6EC; /* Soft Blue Grey */
+@layer base {
+  /*
+   * Colour system: red and black.
+   * Charcoal-black (not pure black) = authority, seriousness, focus.
+   * Red = urgency and threat: the single accent for brand, links and critical items.
+   * Amber marks "high" so critical (red) still stands apart.
+   */
+  :root {
+    --paper: 13 13 14;
+    --paper-raised: 21 21 23;
+    --paper-sunk: 30 30 33;
+    --ink: 216 212 206;
+    --ink-2: 172 168 162;
+    --ink-3: 128 125 120;
+    --ink-4: 92 90 87;
+    --rule: 40 40 43;
+    --edge: 60 60 64;
+    --brand: 229 45 39;
+    --brand-dark: 255 92 84;
+    --brand-navy: 21 21 23;
+    --brand-wash: 58 18 16;
+    --signal: 229 45 39;
+    --signal-deep: 255 92 84;
+    --signal-wash: 58 18 16;
+    --caution: 245 166 35;
+    --medium: 160 156 150;
+    --safe: 74 200 120;
+    --gilt: 255 255 255;
+    --shade: 6 6 7;
+    color-scheme: dark;
+  }
+
+
+  /* Light option: warm newsprint with the same red. */
+  .light {
+    --paper: 247 243 235;
+    --paper-raised: 251 248 242;
+    --paper-sunk: 236 230 218;
+    --ink: 20 20 20;
+    --ink-2: 56 54 50;
+    --ink-3: 110 106 100;
+    --ink-4: 160 155 147;
+    --rule: 224 216 202;
+    --edge: 205 196 180;
+    --brand: 200 32 28;
+    --brand-dark: 160 22 18;
+    --brand-navy: 20 20 20;
+    --brand-wash: 250 226 222;
+    --signal: 200 32 28;
+    --signal-deep: 160 22 18;
+    --signal-wash: 250 226 222;
+    --caution: 176 96 6;
+    --medium: 110 106 100;
+    --shade: 20 20 20;
+    color-scheme: light;
+  }
+
+  html {
+    background: rgb(var(--paper));
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased transition-colors duration-300;
+    font-feature-settings: "ss01", "cv11";
+    overflow-x: hidden;
+  }
+
+  /* Headlines: bold, clean sans, as on major international news sites. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: rgb(var(--brand));
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+  }
+
+  /* Modern scrollbars: thin, rounded, theme-aware, nearly invisible until hovered. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--edge)) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--edge));
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--ink-4));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-/* Base Light Theme */
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
+@layer components {
+  /* Small category / section label */
+  .kicker {
+    @apply text-sm font-medium text-ink-3;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-sm font-medium text-brand;
+  }
 
-/* Refined, elegant scrollbar for Coastal Tech */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  .section-head {
+    @apply mb-8 flex items-end justify-between gap-4;
+  }
+  .section-title {
+    @apply text-2xl font-bold tracking-[-0.025em] text-ink sm:text-[1.75rem];
+  }
 
-::-webkit-scrollbar-track {
-  background: #F7FAFC;
-}
+  .link {
+    @apply text-brand underline-offset-4 transition-colors hover:text-brand-dark hover:underline;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #C8DFE6;
-  border-radius: 9999px;
-}
+  /* Card: .shell is the outer wrapper (layout only), .core is the visible surface */
+  .shell {
+    @apply rounded-xl;
+  }
+  .core {
+    @apply rounded-xl border border-rule bg-paper-raised;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #087E8B;
-}
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-[background-color,color,border-color,box-shadow] duration-200 active:translate-y-px disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-brand;
+  }
+  .btn-quiet {
+    @apply btn border border-edge text-ink hover:border-ink;
+  }
+  .btn-icon {
+    @apply flex h-5 w-5 items-center justify-center transition-transform duration-200 group-hover:translate-x-0.5;
+  }
 
-/* Editorial selection */
-::selection {
-  background-color: #E5F2F5;
-  color: #087E8B;
-}
+  .field {
+    @apply w-full rounded-lg border border-edge bg-paper-raised px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-4 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-[border-color,box-shadow] focus:border-ink focus:outline-none focus:ring-4 focus:ring-ink/10;
+  }
 
-/* Badge classes */
-.badge-signal {
-  background-color: #FDF2F0;
-  color: #E45B48;
-  border: 1px solid #F6BEB7;
-}
+  .tag {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold;
+  }
 
-.badge-watch {
-  background-color: #FEF7ED;
-  color: #C68832;
-  border: 1px solid #FAD9A6;
-}
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 
-.badge-unverified {
-  background-color: #EDF2F7;
-  color: #68788A;
-  border: 1px solid #DCE6EC;
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .line-clamp-2 {
@@ -81,4 +205,55 @@ body {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Horizontal rows: no visible scrollbar, edges fade out instead of hard-clipping. */
+.scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 20px, #000 calc(100% - 20px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 20px, #000 calc(100% - 20px), transparent);
+}
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Scroll-driven effects (native CSS, no JS scroll listeners).
+ * Browsers without support simply don't show them.
+ */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Thin reading-progress line along the bottom of the header. */
+    .read-progress {
+      animation: mcw-grow linear both;
+      animation-timeline: scroll(root);
+    }
+    /* Header gains a soft shadow once the page has scrolled a little. */
+    .header-scroll {
+      animation: mcw-lift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 120px;
+    }
+    /* Images inside sections drift in slightly as they enter the viewport. */
+    .view-in {
+      animation: mcw-view linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+@keyframes mcw-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes mcw-lift {
+  from { box-shadow: 0 0 0 0 rgb(var(--shade) / 0); }
+  to { box-shadow: 0 8px 24px -12px rgb(var(--shade) / 0.25); }
+}
+@keyframes mcw-view {
+  from { opacity: 0; transform: translateY(24px) scale(0.985); }
+  to { opacity: 1; transform: none; }
 }

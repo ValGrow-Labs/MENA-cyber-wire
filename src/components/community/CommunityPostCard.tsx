@@ -1,38 +1,46 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { ArrowBigUp, ArrowBigDown, MessageSquare, Share2, Check } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { CommunityPost } from "@/types/community";
 import { LocalStore } from "@/lib/storage/local-store";
 
 interface Props {
   post: CommunityPost;
   onPostUpdated?: (updated: CommunityPost) => void;
+  onOpen?: () => void;
 }
 
-export default function CommunityPostCard({ post, onPostUpdated }: Props) {
-  const [upvotes, setUpvotes] = useState(post.upvotes);
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter((w) => /^[A-Za-z]/.test(w) && !["of", "and", "&"].includes(w.toLowerCase()))
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+}
+
+/** Discussion row: vote column · square monogram · title, body, meta. */
+export default function CommunityPostCard({ post, onOpen }: Props) {
+  const [score, setScore] = useState(post.upvotes);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const votes = LocalStore.getUpvotedIds();
-    if (votes[post.id]) {
-      setUserVote(votes[post.id]);
-    }
+    if (votes[post.id]) setUserVote(votes[post.id]);
   }, [post.id]);
 
-  const handleVote = (type: "up" | "down") => {
+  const vote = (type: "up" | "down") => {
     if (userVote === type) {
       LocalStore.setVote(post.id, null);
       setUserVote(null);
-      setUpvotes((v) => (type === "up" ? v - 1 : v + 1));
+      setScore((v) => (type === "up" ? v - 1 : v + 1));
     } else {
       const old = userVote;
       LocalStore.setVote(post.id, type);
       setUserVote(type);
-      setUpvotes((v) => {
+      setScore((v) => {
         if (old === "up" && type === "down") return v - 2;
         if (old === "down" && type === "up") return v + 2;
         return type === "up" ? v + 1 : v - 1;
@@ -40,130 +48,78 @@ export default function CommunityPostCard({ post, onPostUpdated }: Props) {
     }
   };
 
-  const handleShare = async () => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/community?post=${post.id}` : "";
+  const share = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(`${window.location.origin}/community?post=${post.id}`);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 1800);
     } catch {}
   };
 
-  const formattedDate = new Date(post.timestamp).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const date = new Date(post.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  const meta = "text-xs font-medium text-ink-3 transition-colors hover:text-ink";
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-border overflow-hidden hover:border-teal/40 hover:shadow-coastal transition-all">
-      <div className="p-4 sm:p-5 flex gap-3 sm:gap-4 items-start">
-        {/* Reddit-style Vertical Vote Column in Coastal Tech styling */}
-        <div className="flex flex-col items-center justify-center p-1 rounded-xl bg-mist border border-mist-border flex-shrink-0">
-          <button
-            onClick={() => handleVote("up")}
-            aria-label="Upvote post"
-            className={`p-1 rounded-lg transition-colors ${
-              userVote === "up" ? "text-teal bg-teal-light" : "text-slate-muted hover:text-teal"
-            }`}
+    <article className="group grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-rule py-6 sm:grid-cols-[3rem_1fr]">
+      <div className="flex flex-col items-center gap-0.5 pt-0.5" aria-label="Votes">
+        <button
+          onClick={() => vote("up")}
+          aria-label="Upvote"
+          aria-pressed={userVote === "up"}
+          className={`p-0.5 transition-colors ${userVote === "up" ? "text-ink" : "text-ink-4 hover:text-ink"}`}
+        >
+          <ChevronUp className="h-5 w-5" strokeWidth={userVote === "up" ? 2.25 : 1.5} />
+        </button>
+        <span className="font-mono text-xs text-ink tabular">{score}</span>
+        <button
+          onClick={() => vote("down")}
+          aria-label="Downvote"
+          aria-pressed={userVote === "down"}
+          className={`p-0.5 transition-colors ${userVote === "down" ? "text-ink" : "text-ink-4 hover:text-ink"}`}
+        >
+          <ChevronDown className="h-5 w-5" strokeWidth={userVote === "down" ? 2.25 : 1.5} />
+        </button>
+      </div>
+
+      <div className="min-w-0">
+        <div className="flex items-center gap-3">
+          <span
+            className="flex h-8 w-8 shrink-0 items-center justify-center bg-ink font-mono text-2xs font-medium text-paper"
+            aria-hidden
           >
-            <ArrowBigUp className={`w-5 h-5 ${userVote === "up" ? "fill-teal text-teal" : ""}`} />
-          </button>
-          <span className="text-xs font-bold font-mono text-ocean py-0.5">
-            {upvotes}
+            {initials(post.author.name) || "?"}
           </span>
-          <button
-            onClick={() => handleVote("down")}
-            aria-label="Downvote post"
-            className={`p-1 rounded-lg transition-colors ${
-              userVote === "down" ? "text-ocean bg-slate-subtle" : "text-slate-muted hover:text-ocean"
-            }`}
-          >
-            <ArrowBigDown className={`w-5 h-5 ${userVote === "down" ? "fill-ocean text-ocean" : ""}`} />
-          </button>
+          <div className="min-w-0 text-sm leading-tight">
+            <span className="block truncate text-ink">{post.author.name}</span>
+            <span className="block text-xs font-medium text-ink-3">
+              {post.author.role} · {post.country} · <span className="tabular">{date}</span>
+            </span>
+          </div>
+          {post.isPinned && <span className="tag ml-auto shrink-0 border border-edge px-1.5 py-0.5 text-ink">Pinned</span>}
         </div>
 
-        {/* Content Column */}
-        <div className="flex-1 min-w-0">
-          {/* Author & Context Bar */}
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-muted mb-1.5">
-            <span className="font-bold text-ocean">
-              {post.author.name}
-            </span>
-            <span className="font-mono text-[11px] text-teal">
-              {post.author.handle}
-            </span>
-            {post.author.badge && (
-              <span className="px-2 py-0.5 text-[9px] font-semibold rounded-md bg-mist text-ocean border border-mist-border">
-                {post.author.badge}
-              </span>
-            )}
-            <span>&middot;</span>
-            <span className="text-ocean font-bold">{post.country}</span>
-            <span>&middot;</span>
-            <span>{formattedDate}</span>
+        <button onClick={onOpen} className="mt-3 block text-left">
+          <h2 className="font-serif text-xl font-semibold leading-snug tracking-[-0.01em] text-ink decoration-1 underline-offset-[5px] group-hover:underline">
+            {post.title}
+          </h2>
+        </button>
 
-            {/* Pinned / Feature badge */}
-            {post.isPinned && (
-              <span className="ml-auto px-2 py-0.5 text-[9px] font-bold uppercase bg-mist border border-mist-border text-teal rounded-md">
-                Featured Topic
-              </span>
-            )}
-          </div>
+        <p className="mt-2 max-w-prose text-[0.9375rem] leading-relaxed text-ink-2 line-clamp-3">{post.body}</p>
 
-          {/* Title */}
-          <Link href={`/community?post=${post.id}`}>
-            <h3 className="text-base sm:text-lg font-bold text-ocean hover:text-teal transition-colors leading-snug">
-              {post.title}
-            </h3>
-          </Link>
+        {post.tags?.length > 0 && (
+          <p className="mt-3 font-mono text-2xs text-ink-3">{post.tags.map((t) => `#${t}`).join("  ")}</p>
+        )}
 
-          {/* Body */}
-          <p className="mt-2 text-xs sm:text-sm text-slate-dark leading-relaxed">
-            {post.body}
-          </p>
-
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-ice text-slate-dark border border-slate-border"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Bottom Actions Bar */}
-          <div className="mt-4 pt-3 border-t border-slate-border flex items-center justify-between text-xs">
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/community?post=${post.id}`}
-                className="flex items-center gap-1.5 text-xs font-bold text-slate-muted hover:text-teal transition-colors"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-teal" />
-                <span>{post.commentsCount} Comments</span>
-              </Link>
-
-              <button
-                onClick={handleShare}
-                className="flex items-center gap-1 text-slate-muted hover:text-ocean transition-colors"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-teal" /> : <Share2 className="w-3.5 h-3.5" />}
-                <span>{copied ? "Link Copied" : "Share"}</span>
-              </button>
-            </div>
-
-            <span className="text-[11px] font-semibold text-ocean bg-mist px-2.5 py-0.5 rounded-md border border-mist-border">
-              {post.topic}
-            </span>
-          </div>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <span className="kicker text-ink">{post.topic}</span>
+          <button onClick={onOpen} className={meta}>
+            <span className="tabular">{post.commentsCount}</span> {post.commentsCount === 1 ? "reply" : "replies"}
+          </button>
+          <button onClick={share} className={meta}>
+            {copied ? "Link copied" : "Copy link"}
+          </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

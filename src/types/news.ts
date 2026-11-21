@@ -30,7 +30,7 @@ export interface NewsArticle {
   imageUrl?: string;
   publishedAt: string;
   country?: string;
-  region: "Gulf" | "Levant" | "North Africa" | "MENA General";
+  region: "Gulf" | "Levant" | "North Africa" | "MENA General" | "Global";
   category: NewsCategory;
   severity: ThreatSeverity;
   verificationStatus: VerificationStatus;

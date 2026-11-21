@@ -1,123 +1,118 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { MENA_COUNTRIES } from "@/lib/country/mena-countries";
 import { CountryData } from "@/types/country";
-import { Shield, AlertTriangle, ExternalLink, ArrowRight, ShieldCheck, MapPin } from "lucide-react";
-import Link from "next/link";
 
 interface Props {
   onSelectCountry?: (country: CountryData) => void;
   selectedCountryCode?: string;
 }
 
+const LEVEL: Record<CountryData["threatLevel"], number> = { Guarded: 1, Elevated: 2, High: 3, Critical: 4 };
+const REGIONS: CountryData["region"][] = ["Gulf", "Levant", "North Africa"];
+
+/** Country desks: an index grouped by region on the left, the selected dossier on the right. */
 export default function CountryImpactMap({ onSelectCountry, selectedCountryCode }: Props) {
-  const [activeCode, setActiveCode] = useState<string>(selectedCountryCode || "SA");
+  const [active, setActive] = useState(selectedCountryCode || "SA");
+  const current = MENA_COUNTRIES.find((c) => c.code === active) || MENA_COUNTRIES[0];
 
-  const currentCountry = MENA_COUNTRIES.find((c) => c.code === activeCode) || MENA_COUNTRIES[0];
-
-  const handleCountryClick = (c: CountryData) => {
-    setActiveCode(c.code);
-    if (onSelectCountry) {
-      onSelectCountry(c);
-    }
+  const pick = (c: CountryData) => {
+    setActive(c.code);
+    onSelectCountry?.(c);
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-border p-5 sm:p-6 shadow-coastal-card">
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-border">
-        <div>
-          <h3 className="text-sm font-extrabold uppercase tracking-wider text-ocean flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-teal" />
-            MENA Cyber Impact Map & Regional Threat Posture
-          </h3>
-          <p className="text-xs text-slate-muted mt-0.5">
-            Real-time cybersecurity posture monitoring across 13 Middle East & North African nations.
-          </p>
-        </div>
-
-        <Link
-          href={`/mena?country=${currentCountry.code}`}
-          className="text-xs font-bold text-teal hover:text-teal-dark flex items-center gap-1 hover:underline"
-        >
-          <span>View {currentCountry.name} Dossier</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+    <div>
+      <div className="section-head">
+        <h2 className="section-title">Country desks</h2>
+        <Link href="/mena" className="text-xs font-medium text-ink-3 hover:text-ink">
+          All 13 →
         </Link>
       </div>
 
-      {/* Grid of Country Pills (Coastal Tech styled) */}
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {MENA_COUNTRIES.map((c) => {
-          const isSelected = c.code === activeCode;
-          return (
-            <button
-              key={c.code}
-              onClick={() => handleCountryClick(c)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${isSelected
-                ? "bg-teal text-white shadow-coastal scale-102 font-bold"
-                : "bg-ice text-slate-dark border border-slate-border hover:border-teal hover:bg-mist"
-                }`}
-            >
-              <span className="text-sm">{c.flag}</span>
-              <span>{c.name}</span>
-              <span className={`w-2 h-2 rounded-full ${c.threatLevel === "High" ? "bg-alert-orange" : c.threatLevel === "Elevated" ? "bg-amber-desert" : "bg-teal"
-                }`} />
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Selected Country Dossier Panel */}
-      <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-mist/60 border border-mist-border space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-mist-border">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{currentCountry.flag}</span>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="text-base sm:text-lg font-bold text-ocean">
-                  {currentCountry.name}
-                </h4>
-                <span className="text-xs text-slate-muted">
-                  ({currentCountry.nativeName})
-                </span>
+      <div className="grid gap-8 md:grid-cols-12">
+        <div className="md:col-span-5">
+          {REGIONS.map((region) => {
+            const list = MENA_COUNTRIES.filter((c) => c.region === region);
+            if (!list.length) return null;
+            return (
+              <div key={region} className="mb-4 last:mb-0">
+                <p className="kicker mb-1">{region}</p>
+                <ul>
+                  {list.map((c) => {
+                    const sel = c.code === active;
+                    const lvl = LEVEL[c.threatLevel] ?? 1;
+                    return (
+                      <li key={c.code}>
+                        <button
+                          onClick={() => pick(c)}
+                          aria-pressed={sel}
+                          className={`grid w-full grid-cols-[2rem_1fr_auto] items-center gap-2 border-b border-rule px-1.5 py-2 text-left text-sm transition-colors ${
+                            sel ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-raised hover:text-ink"
+                          }`}
+                        >
+                          <span className={`font-mono text-2xs ${sel ? "text-paper/60" : "text-ink-3"}`}>{c.code}</span>
+                          <span className="truncate">{c.name}</span>
+                          <span className="flex items-end gap-[2px]" title={`Threat level: ${c.threatLevel}`}>
+                            {[1, 2, 3, 4].map((i) => (
+                              <span
+                                key={i}
+                                className={`w-[3px] ${
+                                  i <= lvl
+                                    ? lvl >= 3
+                                      ? "bg-signal"
+                                      : sel
+                                      ? "bg-paper"
+                                      : "bg-ink"
+                                    : sel
+                                    ? "bg-paper/25"
+                                    : "bg-rule"
+                                }`}
+                                style={{ height: `${3 + i * 2}px` }}
+                              />
+                            ))}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-              <span className="text-xs font-mono text-teal font-semibold">
-                National CERT: {currentCountry.certAgency}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-1 text-xs font-bold rounded-lg uppercase tracking-wider ${currentCountry.threatLevel === "High"
-              ? "bg-alert-light text-alert-orange border border-alert-border"
-              : "bg-amber-light text-amber-dark border border-amber-border"
-              }`}>
-              Threat: {currentCountry.threatLevel}
-            </span>
-            <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-ocean border border-slate-border">
-              {currentCountry.activeIncidents} active alert{currentCountry.activeIncidents > 1 ? "s" : ""}
-            </span>
-          </div>
+            );
+          })}
         </div>
 
-        {/* Narrative Summary */}
-        <p className="text-xs sm:text-sm text-slate-dark leading-relaxed">
-          {currentCountry.summary}
-        </p>
+        <div key={current.code} className="animate-rise md:col-span-7">
+          <p className="kicker">{current.region} desk</p>
+          <h3 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-ink">{current.name}</h3>
+          <p className="mt-1 font-serif text-lg text-ink-3" lang="ar">
+            {current.nativeName}
+          </p>
 
-        {/* Sectors */}
-        <div className="pt-2 border-t border-mist-border flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-ocean">
-            Critical Infrastructure Verticals:
-          </span>
-          {currentCountry.criticalInfrastructureSectors.map((sector) => (
-            <span
-              key={sector}
-              className="text-[11px] px-2.5 py-0.5 rounded-md bg-white border border-slate-border text-slate-dark font-medium"
-            >
-              {sector}
-            </span>
-          ))}
+          <dl className="mt-5 grid grid-cols-2 border-y border-rule">
+            <div className="py-3 pr-3">
+              <dt className="kicker">Our assessment</dt>
+              <dd className={`mt-1 font-serif text-xl ${LEVEL[current.threatLevel] >= 3 ? "text-signal" : "text-ink"}`}>
+                {current.threatLevel}
+              </dd>
+            </div>
+            <div className="border-l border-rule px-3 py-3">
+              <dt className="kicker">National CERT</dt>
+              <dd className="mt-1 text-sm leading-snug text-ink">{current.certAgency}</dd>
+            </div>
+          </dl>
+
+          <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink-2">{current.summary}</p>
+          <p className="mt-2 text-sm text-ink-3">
+            <span className="kicker mr-2">Key sectors</span>
+            {current.criticalInfrastructureSectors.join(" · ")}
+          </p>
+
+          <Link href={`/mena?country=${current.code}`} className="link mt-5 inline-block text-sm text-ink">
+            Open the {current.name} desk →
+          </Link>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 import { NewsArticle, NewsCategory, ThreatSeverity, VerificationStatus } from "@/types/news";
 import { CURATED_MENA_INTELLIGENCE } from "../news/curated-seed";
+import { assignUniqueImages } from "../media/category-images";
 
 const GOOGLE_NEWS_QUERIES = [
   "Cybersecurity Middle East",
@@ -30,6 +31,9 @@ function cleanHtml(html: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -125,7 +129,8 @@ function detectVerification(text: string): VerificationStatus {
   if (lower.includes("developing") || lower.includes("investigating") || lower.includes("monitoring") || lower.includes("watch")) {
     return "WATCH";
   }
-  return "SIGNAL";
+  // Wire copy from third-party publishers is "reported", not confirmed by our desk.
+  return "WATCH";
 }
 
 function extractPublisher(title: string): { cleanTitle: string; sourceName: string } {
@@ -140,12 +145,7 @@ function extractPublisher(title: string): { cleanTitle: string; sourceName: stri
   return { cleanTitle: title, sourceName: "Cyber Intelligence Wire" };
 }
 
-export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsArticle[]> {
-  const now = Date.now();
-  if (rssCache && (now - rssCache.timestamp < CACHE_TTL) && rssCache.data.length > 0) {
-    return rssCache.data;
-  }
-
+async function fetchGoogleItems(queryIndex: number = 0): Promise<NewsArticle[]> {
   const selectedQuery = GOOGLE_NEWS_QUERIES[queryIndex % GOOGLE_NEWS_QUERIES.length];
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(selectedQuery)}&hl=en-US&gl=US&ceid=US:en`;
 
@@ -165,7 +165,7 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      return CURATED_MENA_INTELLIGENCE;
+      return [];
     }
 
     const xmlData = await response.text();
@@ -177,10 +177,14 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
 
     const items = parsed?.rss?.channel?.item;
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return CURATED_MENA_INTELLIGENCE;
+      return [];
     }
 
-    const liveArticles: NewsArticle[] = items.slice(0, 20).map((item: any, idx: number) => {
+    // Drop market-research press releases and listicle spam: they are not news.
+    const SPAM = /market (size|share|report|research|analysis|forecast)|growth analysis|cagr|forecast (to|till) 20\d\d|report,? 20\d\d|industry (trends|outlook)|top \d+ (cybersecurity )?companies/i;
+    const newsItems = items.filter((item: any) => !SPAM.test(cleanHtml(item.title || "")));
+
+    const liveArticles: NewsArticle[] = newsItems.slice(0, 24).map((item: any, idx: number) => {
       const rawTitle = cleanHtml(item.title || "MENA Cybersecurity Update");
       const { cleanTitle, sourceName } = extractPublisher(rawTitle);
       const rawDesc = cleanHtml(item.description || item.contentSnippet || "");
@@ -194,10 +198,12 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
       const link = item.link || item.guid || `live-${idx}`;
       const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
 
+      // Google News "descriptions" usually just repeat the headline and publisher. Don't show that as a summary.
+      const repeatsTitle = rawDesc.toLowerCase().startsWith(cleanTitle.toLowerCase().slice(0, 40));
       return {
         id: `gn-${idx}-${Math.abs(hashString(link))}`,
         title: cleanTitle,
-        description: rawDesc.length > 20 ? rawDesc : `Reporting on ${category.toLowerCase()} developments affecting digital assets in the ${country} region.`,
+        description: repeatsTitle || rawDesc.length <= 20 ? "" : rawDesc,
         sourceName: item.source?.["#text"] || sourceName,
         sourceUrl: item.link || "https://news.google.com",
         publishedAt: pubDate,
@@ -209,18 +215,14 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
         tags: [country, category, "MENA"].filter(Boolean),
         upvotes: 0,
         commentCount: 0,
-        readTime: `${Math.max(2, Math.min(6, Math.floor(cleanTitle.length / 18)))} min read`,
         isDemo: false
       };
     });
 
-    // Merge live articles with curated MENA investigations
-    const combined = [...CURATED_MENA_INTELLIGENCE, ...liveArticles];
-    rssCache = { timestamp: now, data: combined };
-    return combined;
+    return liveArticles;
 
   } catch (err) {
-    return CURATED_MENA_INTELLIGENCE;
+    return [];
   }
 }
 
@@ -231,4 +233,111 @@ function hashString(str: string): number {
     hash |= 0;
   }
   return hash;
+}
+
+/* ------------------------------------------------------------------ */
+/* Established security newsrooms: real summaries and real photos.     */
+/* We show a short excerpt and always link to the original article.    */
+/* ------------------------------------------------------------------ */
+
+const PUBLISHER_FEEDS = [
+  { name: "The Hacker News", url: "https://feeds.feedburner.com/TheHackersNews" },
+  { name: "BleepingComputer", url: "https://www.bleepingcomputer.com/feed/" },
+  { name: "The Record", url: "https://therecord.media/feed" },
+  { name: "SecurityWeek", url: "https://www.securityweek.com/feed/" },
+  { name: "Dark Reading", url: "https://www.darkreading.com/rss.xml" },
+];
+
+const MAX_AGE_MS = 30 * 24 * 3600 * 1000;
+
+function pickImage(item: any): string | undefined {
+  const fromAttr = (x: any) => (Array.isArray(x) ? x[0]?.["@_url"] : x?.["@_url"]);
+  const candidates = [
+    fromAttr(item["media:content"]),
+    fromAttr(item["media:thumbnail"]),
+    item.enclosure && String(item.enclosure["@_type"] || "image").startsWith("image") ? fromAttr(item.enclosure) : undefined,
+    String(item["content:encoded"] || item.description || "").match(/<img[^>]+src=["']([^"']+)["']/i)?.[1],
+  ];
+  const url = candidates.find((u) => typeof u === "string" && /^https:\/\//.test(u));
+  return url || undefined;
+}
+
+function excerpt(html: string, max = 320): string {
+  const text = cleanHtml(String(html || "")).replace(/The post .* appeared first on .*$/i, "").trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  return cut.slice(0, Math.max(cut.lastIndexOf(". ") + 1, cut.lastIndexOf(" "))).trim() + "…";
+}
+
+async function fetchPublisher(feed: { name: string; url: string }): Promise<NewsArticle[]> {
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 7000);
+    const res = await fetch(feed.url, {
+      signal: controller.signal,
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; MENACyberWire/1.0; news reader)", Accept: "application/rss+xml, application/xml, text/xml" },
+      next: { revalidate: 900 },
+    });
+    clearTimeout(t);
+    if (!res.ok) return [];
+    const parsed = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" }).parse(await res.text());
+    const raw = parsed?.rss?.channel?.item;
+    const items: any[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+
+    return items.slice(0, 20).map((item: any, idx: number): NewsArticle => {
+      const title = cleanHtml(String(item.title || ""));
+      const description = excerpt(item.description || item["content:encoded"] || "");
+      const text = `${title} ${description}`;
+      const { country, region } = detectCountry(text);
+      const isRegional = country !== "Regional MENA";
+      const link = String(item.link || item.guid?.["#text"] || item.guid || "");
+      const category = detectCategory(text);
+      return {
+        id: `pub-${Math.abs(hashString(link || title + idx))}`,
+        title,
+        description,
+        sourceName: feed.name,
+        sourceUrl: link,
+        imageUrl: pickImage(item),
+        publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+        country: isRegional ? country : undefined,
+        region: isRegional ? region : "Global",
+        category,
+        severity: detectSeverity(text),
+        verificationStatus: "WATCH",
+        tags: [isRegional ? country : "Global", category].filter(Boolean) as string[],
+        upvotes: 0,
+        commentCount: 0,
+        isDemo: false,
+      };
+    }).filter((a) => a.title && a.sourceUrl);
+  } catch {
+    return [];
+  }
+}
+
+const norm = (t: string) => t.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim().slice(0, 80);
+
+/**
+ * The site's feed: desk background pieces + MENA-focused Google News + established security newsrooms.
+ * Wire items older than 30 days are dropped, duplicates removed, and every story gets a unique photo.
+ */
+export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsArticle[]> {
+  const now = Date.now();
+  if (rssCache && now - rssCache.timestamp < CACHE_TTL && rssCache.data.length > 0) return rssCache.data;
+
+  const [google, ...pubs] = await Promise.all([fetchGoogleItems(queryIndex), ...PUBLISHER_FEEDS.map(fetchPublisher)]);
+  const wire = [...google, ...pubs.flat()].filter((a) => now - new Date(a.publishedAt).getTime() < MAX_AGE_MS);
+
+  const seen = new Set<string>();
+  const unique = wire.filter((a) => {
+    const k = norm(a.title);
+    if (!k || seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  const combined = assignUniqueImages([...CURATED_MENA_INTELLIGENCE, ...unique]);
+  if (unique.length > 0) rssCache = { timestamp: now, data: combined };
+  return combined;
 }

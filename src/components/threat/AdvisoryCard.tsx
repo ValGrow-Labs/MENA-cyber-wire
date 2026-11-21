@@ -1,74 +1,55 @@
 import { CISAAdvisory } from "@/types/threat";
-import { ExternalLink, ShieldCheck } from "lucide-react";
 
 interface Props {
   advisory: CISAAdvisory;
 }
 
 export default function AdvisoryCard({ advisory }: Props) {
-  const formattedDate = new Date(advisory.publishedDate).toLocaleDateString("en-US", {
-    month: "short",
+  const date = new Date(advisory.publishedDate).toLocaleDateString("en-GB", {
     day: "numeric",
+    month: "short",
     year: "numeric",
   });
+  const urgent = advisory.severity === "Critical";
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-border hover:border-teal/50 hover:shadow-coastal transition-all">
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-border">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-alert-orange bg-alert-light px-2 py-0.5 rounded-md border border-alert-border">
-            {advisory.id}
-          </span>
-          <span className="text-xs text-slate-muted">&middot;</span>
-          <span className="text-xs font-bold text-ocean">
-            {advisory.source}
-          </span>
-        </div>
-
-        <span className="text-xs text-slate-muted font-mono">
-          {formattedDate}
-        </span>
+    <article className="grid gap-x-5 border-t border-rule py-6 sm:grid-cols-[10.5rem_1fr]">
+      <div className="mb-2 text-xs font-medium text-ink-3 sm:mb-0">
+        <span className="block text-ink">{advisory.source}</span>
+        <span className="block">{advisory.id}</span>
+        <time dateTime={advisory.publishedDate} className="block tabular">{date}</time>
+        <span className={`mt-2 block ${urgent ? "text-signal" : ""}`}>{advisory.severity}</span>
       </div>
 
-      <h3 className="mt-2.5 text-sm sm:text-base font-bold text-ocean leading-snug">
-        {advisory.title}
-      </h3>
+      <div className="min-w-0">
+        <h3 className="font-serif text-xl font-semibold leading-snug tracking-[-0.01em] text-ink">
+          <a href={advisory.sourceUrl} target="_blank" rel="noopener noreferrer" className="decoration-1 underline-offset-[5px] hover:underline">
+            {advisory.title}
+          </a>
+        </h3>
+        <p className="mt-2 max-w-prose text-[0.9375rem] leading-relaxed text-ink-2">{advisory.summary}</p>
 
-      <p className="mt-2 text-xs sm:text-sm text-slate-dark leading-relaxed">
-        {advisory.summary}
-      </p>
+        {advisory.remediationAction && (
+          <p className="mt-3 max-w-prose border-l-2 border-edge pl-3 text-sm leading-relaxed text-ink-2">
+            <span className="kicker mr-2 text-ink">What to do</span>
+            {advisory.remediationAction}
+          </p>
+        )}
 
-      {/* Remediation Note */}
-      <div className="mt-3 p-3 rounded-xl bg-mist/60 border border-mist-border text-xs">
-        <span className="font-bold text-ocean flex items-center gap-1.5 mb-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-teal" />
-          Required Defensive Action:
-        </span>
-        <p className="text-slate-dark text-[11px]">
-          {advisory.remediationAction}
-        </p>
-      </div>
-
-      {/* Action link */}
-      <div className="mt-4 pt-3 border-t border-slate-border flex items-center justify-between">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {advisory.cveList && advisory.cveList.map((cve) => (
-            <span key={cve} className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-ice border border-slate-border text-ocean font-semibold">
-              {cve}
-            </span>
+        <div className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          {advisory.cveList?.map((id) => (
+            <span key={id} className="font-mono text-2xs text-ink-3">{id}</span>
           ))}
+          <a
+            href={advisory.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link ml-auto text-sm text-ink"
+          >
+            Read the advisory ↗
+          </a>
         </div>
-
-        <a
-          href={advisory.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-xs font-bold text-teal hover:underline"
-        >
-          <span>Official Advisory Notice</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
       </div>
-    </div>
+    </article>
   );
 }

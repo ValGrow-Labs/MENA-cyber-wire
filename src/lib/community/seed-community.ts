@@ -1,85 +1,98 @@
-import { CommunityPost } from "@/types/community";
+import { CommunityPost, CommunityAuthor } from "@/types/community";
+
+/**
+ * Discussion prompts written by the site's editors to start conversations.
+ * They describe no specific incident and carry no votes or replies.
+ */
+const EDITORS: CommunityAuthor = {
+  name: "MENA Cyber Wire editors",
+  handle: "@mcw_desk",
+  role: "Editors",
+  badge: "Discussion prompt",
+  verified: false,
+};
+
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3600 * 1000).toISOString();
+
+const prompt = (
+  id: string,
+  title: string,
+  body: string,
+  topic: string,
+  country: string,
+  tags: string[],
+  postedHoursAgo: number,
+  isPinned = false
+): CommunityPost => ({
+  id,
+  title,
+  body,
+  topic,
+  country,
+  author: EDITORS,
+  timestamp: hoursAgo(postedHoursAgo),
+  upvotes: 0,
+  downvotes: 0,
+  commentsCount: 0,
+  tags,
+  isPinned,
+  comments: [],
+});
 
 export const SEED_COMMUNITY_POSTS: CommunityPost[] = [
-  {
-    id: "topic-101",
-    title: "Implementing NCA ECC-1:2018 in Multi-Account Cloud Environments: Log Residency & CloudTrail Aggregation",
-    body: "Fintechs and regulated entities in Saudi Arabia must comply with NCA Essential Cybersecurity Controls (ECC) regarding local data residency and continuous monitoring. How are teams handling multi-account CloudTrail and GuardDuty log export to local on-prem or local cloud region SIEMs (me-central-1) without incurring excessive NAT or egress charges? Share your architectural patterns and audit observations.",
-    topic: "Compliance & Governance",
-    country: "Saudi Arabia",
-    author: {
-      name: "MENA Cloud Security Working Group",
-      handle: "@cloudsec_mena",
-      role: "Architecture Desk",
-      badge: "Discussion Topic",
-      verified: true
-    },
-    timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
-    upvotes: 0,
-    downvotes: 0,
-    commentsCount: 0,
-    tags: ["NCA", "CloudSecurity", "AWS", "SaudiFintech", "Compliance"],
-    isPinned: true,
-    comments: []
-  },
-  {
-    id: "topic-102",
-    title: "Defending Government & Banking Portals Against Regional Reverse-Proxy Phishing Kits (AiTM)",
-    body: "Advisories across the GCC have noted threat actors deploying adversary-in-the-middle (AiTM) phishing frameworks that bypass standard SMS OTP and mobile application prompts by intercepting session cookies. What mitigations are organizations enforcing beyond FIDO2 / WebAuthn hardware keys, especially for legacy client environments?",
-    topic: "Threat Intelligence",
-    country: "United Arab Emirates",
-    author: {
-      name: "Identity & Access Working Group",
-      handle: "@identity_defense",
-      role: "Threat Intel Desk",
-      badge: "Technical Exchange",
-      verified: true
-    },
-    timestamp: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
-    upvotes: 0,
-    downvotes: 0,
-    commentsCount: 0,
-    tags: ["AiTM", "Phishing", "FIDO2", "aeCERT", "MFA"],
-    comments: []
-  },
-  {
-    id: "topic-103",
-    title: "OT/SCADA Perimeter Defense: Enforcing Zero-Trust Jump Hosts on Purdue Level 2/3 Industrial Networks",
-    body: "With critical infrastructure and maritime telemetry facing increased automated scanning, securing foreign OEM pump and turbine vendor remote sessions is critical. How are regional energy and utility operators enforcing ephemeral PAM credentials, session isolation, and video auditing without disrupting operational availability?",
-    topic: "Industrial Control Systems",
-    country: "Qatar",
-    author: {
-      name: "Critical Infrastructure Security Group",
-      handle: "@ot_defense_mena",
-      role: "ICS Security Desk",
-      badge: "OT Defense",
-      verified: true
-    },
-    timestamp: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
-    upvotes: 0,
-    downvotes: 0,
-    commentsCount: 0,
-    tags: ["OTSecurity", "SCADA", "Q-CERT", "PurdueModel", "Maritime"],
-    comments: []
-  },
-  {
-    id: "topic-104",
-    title: "Regional Threat Actor Attribution: Curating MENA MISP Feeds for MuddyWater, Agrius, and OilRig",
-    body: "Public global feeds often delay correlation for regional Middle East intrusion sets. Let's document open indicators, Yara rules, and MISP threat taxonomy galaxies focused on tracking regional persistent threats targeting government, financial, and telecommunication perimeters.",
-    topic: "Research & Open Source",
-    country: "Regional MENA",
-    author: {
-      name: "Open Threat Intelligence Initiative",
-      handle: "@osint_mena",
-      role: "Research Desk",
-      badge: "MISP Sharing",
-      verified: true
-    },
-    timestamp: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    upvotes: 0,
-    downvotes: 0,
-    commentsCount: 0,
-    tags: ["MISP", "ThreatIntel", "ATT&CK", "OpenSource", "MENA"],
-    comments: []
-  }
+  prompt(
+    "topic-101",
+    "How long are you keeping SOC logs under Saudi Arabia's Personal Data Protection Law?",
+    "Security logs are full of personal data: usernames, IP addresses, email headers, sometimes message content. The PDPL expects personal data to be kept only as long as needed for its purpose, while incident response and forensic work want long retention. How have you set retention periods for SIEM and EDR data, and how did you document the justification? Did you pseudonymise anything before long-term storage?",
+    "Compliance & Governance",
+    "Saudi Arabia",
+    ["PDPL", "SIEM", "LogRetention", "Privacy"],
+    3,
+    true
+  ),
+  prompt(
+    "topic-102",
+    "Rolling out FIDO2 security keys to staff who mostly work in Arabic",
+    "Hardware keys and passkeys stop most credential phishing, but rollouts stall on training and support. If you have deployed FIDO2 to a largely Arabic-speaking workforce: what enrolment instructions worked, which identity provider screens were poorly localised, and how did you handle staff on shared or personal devices?",
+    "Compliance & Governance",
+    "United Arab Emirates",
+    ["FIDO2", "Passkeys", "MFA", "Localisation"],
+    9
+  ),
+  prompt(
+    "topic-103",
+    "Segmenting OT networks at desalination and water treatment plants",
+    "Water utilities in the Gulf depend on desalination, and their control systems were often built for availability, not isolation. For those running or auditing these sites: where do you draw the boundary between corporate IT and the control network, how do you handle vendor remote access, and have unidirectional gateways been practical for historian data?",
+    "Industrial Control Systems",
+    "Kuwait",
+    ["OT", "ICS", "Water", "Segmentation"],
+    20
+  ),
+  prompt(
+    "topic-104",
+    "Reporting on ransomware leak-site claims without amplifying them",
+    "Leak sites post victim names before anything is confirmed, and some claims turn out to be recycled or false. Journalists, communications teams and responders: what checks do you run before treating a claim as real, and how should outlets word a story when the named organisation hasn't commented yet?",
+    "Threat Intelligence",
+    "Regional MENA",
+    ["Ransomware", "LeakSites", "Verification", "Media"],
+    30
+  ),
+  prompt(
+    "topic-105",
+    "Incident reporting obligations when you operate in several GCC states",
+    "A bank or telecom with operations in Saudi Arabia, the UAE, Qatar and Bahrain may owe notifications to several national authorities and sector regulators, each with its own timelines and forms. How do your incident response plans map these obligations? Is there a single internal trigger, or a per-country playbook?",
+    "Incident Response",
+    "Regional MENA",
+    ["IncidentResponse", "Regulation", "GCC", "Notification"],
+    44
+  ),
+  prompt(
+    "topic-106",
+    "Detecting adversary-in-the-middle phishing that steals session cookies",
+    "Reverse-proxy phishing kits sit between the user and the real login page, capture the session cookie after MFA, and replay it. Beyond phishing-resistant MFA, what detections have worked for you, impossible-travel alerts, token binding, conditional access on device compliance, or monitoring sign-ins from hosting providers?",
+    "Threat Intelligence",
+    "Regional MENA",
+    ["AiTM", "Phishing", "SessionHijacking", "Detection"],
+    60
+  ),
 ];

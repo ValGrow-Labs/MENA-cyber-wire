@@ -1,122 +1,65 @@
 import Link from "next/link";
 import BrandLogo from "@/components/shared/BrandLogo";
-import { ShieldCheck, Mail, ArrowUpRight } from "lucide-react";
+
+const DESKS = [
+  { label: "Saudi Arabia", href: "/mena?country=SA" },
+  { label: "United Arab Emirates", href: "/mena?country=AE" },
+  { label: "Qatar", href: "/mena?country=QA" },
+  { label: "Egypt", href: "/mena?country=EG" },
+  { label: "Jordan", href: "/mena?country=JO" },
+  { label: "All 13 countries", href: "/mena" },
+];
+
+const SECTIONS = [
+  { label: "Breaking", href: "/breaking" },
+  { label: "Vulnerabilities", href: "/threats" },
+  { label: "Daily brief", href: "/daily-brief" },
+  { label: "Research", href: "/research" },
+  { label: "Community", href: "/community" },
+  { label: "Saved", href: "/saved" },
+];
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 border-t border-slate-border bg-white text-slate-muted text-xs transition-colors">
-      <div className="max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-          {/* Brand Identity */}
-          <div className="space-y-3 md:col-span-1">
-            <BrandLogo size="sm" showTagline={false} />
-            <p className="text-xs leading-relaxed text-slate-dark">
-              MENA Cyber Wire is an independent editorial cybersecurity platform providing real-time awareness and actionable defensive telemetry across 13 Middle East & North African nations.
+    <footer className="mt-24 border-t-2 border-edge">
+      <div className="mx-auto max-w-page px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <BrandLogo size="md" showTagline={false} />
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-2">
+              Independent reporting on attacks, vulnerabilities and policy across the Middle East and North Africa.
+              Every story links to its primary source.
             </p>
-            <div className="flex items-center gap-2 text-[11px] font-bold text-teal">
-              <ShieldCheck className="w-4 h-4 text-teal" />
-              <span>Independent Cybersecurity Journalism</span>
-            </div>
           </div>
 
-          {/* Regional Desks */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-ocean">
-              Regional Desks
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/mena?country=SA" className="hover:text-teal transition-colors">
-                  Saudi Arabia (NCA ECC)
-                </Link>
-              </li>
-              <li>
-                <Link href="/mena?country=AE" className="hover:text-teal transition-colors">
-                  United Arab Emirates (aeCERT)
-                </Link>
-              </li>
-              <li>
-                <Link href="/mena?country=QA" className="hover:text-teal transition-colors">
-                  Qatar & Energy SCADA (Q-CERT)
-                </Link>
-              </li>
-              <li>
-                <Link href="/mena?country=EG" className="hover:text-teal transition-colors">
-                  Egypt & Fintech (EG-CERT)
-                </Link>
-              </li>
-              <li>
-                <Link href="/mena?country=JO" className="hover:text-teal transition-colors">
-                  Levant Security Watch (Jordan & Lebanon)
-                </Link>
-              </li>
+          <nav aria-label="Country desks" className="md:col-span-3 md:col-start-7">
+            <p className="kicker">Country desks</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {DESKS.map((d) => (
+                <li key={d.href}>
+                  <Link href={d.href} className="text-ink-2 hover:text-ink">{d.label}</Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </nav>
 
-          {/* Intelligence Modules */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-ocean">
-              Intelligence Portals
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/breaking" className="hover:text-teal transition-colors">
-                  Breaking Incidents Wire
-                </Link>
-              </li>
-              <li>
-                <Link href="/threats" className="hover:text-teal transition-colors">
-                  NVD CVE Vulnerability Watch
-                </Link>
-              </li>
-              <li>
-                <Link href="/daily-brief" className="hover:text-teal transition-colors">
-                  Daily Cyber Digest
-                </Link>
-              </li>
-              <li>
-                <Link href="/community" className="hover:text-teal transition-colors">
-                  Practitioner Community Forum
-                </Link>
-              </li>
-              <li>
-                <Link href="/research" className="hover:text-teal transition-colors">
-                  Adversary Tracking (MuddyWater / OilRig)
-                </Link>
-              </li>
+          <nav aria-label="Sections" className="md:col-span-3">
+            <p className="kicker">Sections</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {SECTIONS.map((s) => (
+                <li key={s.href}>
+                  <Link href={s.href} className="text-ink-2 hover:text-ink">{s.label}</Link>
+                </li>
+              ))}
             </ul>
-          </div>
-
-          {/* Editorial Standards & Verification */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-ocean">
-              Editorial Standards
-            </h4>
-            <p className="text-xs leading-relaxed text-slate-dark">
-              Every report links directly to primary sources, public advisories, and corroborated indicators. We do not invent incidents or fabricate telemetry.
-            </p>
-            <div className="pt-2">
-              <span className="inline-block px-2.5 py-1 text-[10px] font-mono rounded-md bg-mist text-ocean border border-mist-border">
-                Google News RSS &middot; NVD API 2.0 &middot; CISA
-              </span>
-            </div>
-          </div>
+          </nav>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-6 border-t border-slate-border flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-muted">
-          <div>
-            &copy; {currentYear} MENA CYBER WIRE. Independent digital newsroom and regional cybersecurity intelligence index covering the Middle East and North Africa.
-          </div>
-          <div className="flex items-center gap-4 font-semibold text-ocean">
-            <Link href="/" className="hover:text-teal">Feed</Link>
-            <Link href="/threats" className="hover:text-teal">Threats</Link>
-            <Link href="/mena" className="hover:text-teal">MENA Watch</Link>
-            <Link href="/community" className="hover:text-teal">Community</Link>
-            <Link href="/saved" className="hover:text-teal">Saved</Link>
-          </div>
+        <div className="mt-12 flex flex-col gap-3 border-t border-rule pt-5 text-xs font-medium text-ink-3 sm:flex-row sm:items-center sm:justify-between">
+          <span>© {year} MENA Cyber Wire</span>
+          <span>Sources: Google News RSS · NVD API 2.0 · CISA KEV</span>
         </div>
       </div>
     </footer>
