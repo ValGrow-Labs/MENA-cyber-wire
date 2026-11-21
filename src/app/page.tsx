@@ -9,7 +9,7 @@ import CountryImpactMap from "@/components/country/CountryImpactMap";
 import LoadingSkeleton from "@/components/shared/LoadingSkeleton";
 import ErrorState from "@/components/shared/ErrorState";
 import { NewsArticle } from "@/types/news";
-import { RefreshCw, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import { RefreshCw, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { LocalStore } from "@/lib/storage/local-store";
 

@@ -104,10 +104,10 @@ export default function CommunityPostCard({ post, onPostUpdated }: Props) {
             <span>&middot;</span>
             <span>{formattedDate}</span>
 
-            {/* DEMO Tag clearly labeled */}
-            {post.isDemo && (
-              <span className="ml-auto px-2 py-0.5 text-[9px] font-mono uppercase bg-ice border border-slate-border text-slate-muted rounded-md">
-                Sample Community Post
+            {/* Pinned / Feature badge */}
+            {post.isPinned && (
+              <span className="ml-auto px-2 py-0.5 text-[9px] font-bold uppercase bg-mist border border-mist-border text-teal rounded-md">
+                Featured Topic
               </span>
             )}
           </div>

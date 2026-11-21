@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
-  ArrowBigUp, 
   Bookmark, 
-  MessageSquare, 
   Share2, 
   ExternalLink, 
   ChevronDown, 
@@ -13,7 +11,7 @@ import {
   ShieldCheck, 
   Clock, 
   Check, 
-  Tag
+  ArrowRight
 } from "lucide-react";
 import { NewsArticle } from "@/types/news";
 import ThreatSeverityBadge from "@/components/shared/ThreatSeverityBadge";
@@ -27,33 +25,13 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ article, priority = false }: NewsCardProps) {
-  const [upvotes, setUpvotes] = useState(article.upvotes);
-  const [hasVoted, setHasVoted] = useState<"up" | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [showThreatToAction, setShowThreatToAction] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setIsSaved(LocalStore.isBookmarked(article.id));
-    const votes = LocalStore.getUpvotedIds();
-    if (votes[article.id] === "up") {
-      setHasVoted("up");
-    }
   }, [article.id]);
-
-  const handleVote = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (hasVoted === "up") {
-      LocalStore.setVote(article.id, null);
-      setHasVoted(null);
-      setUpvotes((v) => v - 1);
-    } else {
-      LocalStore.setVote(article.id, "up");
-      setHasVoted("up");
-      setUpvotes((v) => v + 1);
-    }
-  };
 
   const handleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -103,9 +81,9 @@ export default function NewsCard({ article, priority = false }: NewsCardProps) {
   });
 
   return (
-    <article className="group bg-white rounded-2xl border border-slate-border overflow-hidden hover:border-teal/40 hover:shadow-coastal-hover transition-all duration-300">
+    <article className="group bg-white rounded-2xl border border-slate-border overflow-hidden hover:border-teal/40 hover:shadow-coastal transition-all duration-200">
       {/* Top Source, Country & Status Bar */}
-      <div className="px-4 py-2.5 bg-mist/50 border-b border-slate-border flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div className="px-4 py-2.5 bg-mist/40 border-b border-slate-border flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Publisher */}
           <span className="font-bold text-ocean">
@@ -176,7 +154,7 @@ export default function NewsCard({ article, priority = false }: NewsCardProps) {
             )}
           </div>
 
-          {/* Article Thumbnail */}
+          {/* Article Thumbnail if available */}
           {article.imageUrl && (
             <div className="relative w-full sm:w-36 h-28 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-mist border border-slate-border shadow-2xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -190,7 +168,7 @@ export default function NewsCard({ article, priority = false }: NewsCardProps) {
           )}
         </div>
 
-        {/* Expandable Threat-to-Action Protocol */}
+        {/* Expandable Threat-to-Action Protocol if curated */}
         {article.threatToAction && (
           <div className="mt-3.5">
             <button
@@ -198,7 +176,7 @@ export default function NewsCard({ article, priority = false }: NewsCardProps) {
               className="flex items-center gap-1.5 text-xs font-bold text-teal hover:text-teal-dark transition-colors"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>{showThreatToAction ? "Collapse Threat-to-Action Protocol" : "View Threat-to-Action Protocol"}</span>
+              <span>{showThreatToAction ? "Collapse Threat Analysis" : "View Threat-to-Action Analysis"}</span>
               {showThreatToAction ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
 
@@ -208,47 +186,24 @@ export default function NewsCard({ article, priority = false }: NewsCardProps) {
           </div>
         )}
 
-        {/* Card Interaction Bar (Reddit + Instagram inspired) */}
+        {/* Action Bar */}
         <div className="mt-4 pt-3 border-t border-slate-border flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Upvote Pill */}
-            <button
-              onClick={handleVote}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
-                hasVoted === "up"
-                  ? "bg-teal text-white border-teal shadow-xs"
-                  : "bg-white text-ocean border-slate-border hover:bg-mist hover:border-teal/40"
-              }`}
-              title="Upvote intelligence report"
-            >
-              <ArrowBigUp className={`w-4 h-4 ${hasVoted === "up" ? "fill-white" : ""}`} />
-              <span>{upvotes}</span>
-            </button>
-
-            {/* Comments */}
-            <Link
-              href={`/article/${article.id}#comments`}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white text-ocean border border-slate-border hover:bg-mist hover:border-teal/40 transition-colors"
-            >
-              <MessageSquare className="w-3.5 h-3.5 text-teal" />
-              <span>{article.commentCount}</span>
-            </Link>
-
-            {/* Bookmark */}
+          <div className="flex items-center gap-2">
+            {/* Bookmark button */}
             <button
               onClick={handleBookmark}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs transition-colors ${
                 isSaved
                   ? "bg-ocean text-amber-desert border-ocean font-bold"
-                  : "bg-white text-ocean border-slate-border hover:bg-mist hover:border-teal/40"
+                  : "bg-white text-ocean border-slate-border hover:bg-mist"
               }`}
-              title={isSaved ? "Saved to Bookmarks" : "Save for later"}
+              title={isSaved ? "Saved to Bookmarks" : "Save report"}
             >
               <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-current" : ""}`} />
               <span className="hidden sm:inline">{isSaved ? "Saved" : "Save"}</span>
             </button>
 
-            {/* Share */}
+            {/* Share button */}
             <button
               onClick={handleShare}
               className="flex items-center gap-1 px-2 py-1 rounded-lg text-slate-muted hover:text-ocean hover:bg-mist transition-colors"
@@ -259,24 +214,25 @@ export default function NewsCard({ article, priority = false }: NewsCardProps) {
             </button>
           </div>
 
-          {/* Read Article & Source Link */}
+          {/* Links */}
           <div className="flex items-center gap-2">
             <a
               href={article.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1 text-[11px] text-slate-muted hover:text-teal font-medium"
-              title="Open verified primary source"
+              className="flex items-center gap-1 text-[11px] text-slate-muted hover:text-teal font-medium"
+              title="Open primary publisher source"
             >
-              <span>Source</span>
+              <span>Original Source</span>
               <ExternalLink className="w-3 h-3" />
             </a>
 
             <Link
               href={`/article/${article.id}`}
-              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-ocean text-white hover:bg-ocean-dark transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-ice text-ocean hover:bg-teal hover:text-white border border-slate-border transition-colors"
             >
-              Analyze
+              <span>Full Coverage</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>

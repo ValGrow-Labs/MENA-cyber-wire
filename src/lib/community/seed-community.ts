@@ -2,139 +2,84 @@ import { CommunityPost } from "@/types/community";
 
 export const SEED_COMMUNITY_POSTS: CommunityPost[] = [
   {
-    id: "post-101",
-    title: "Best practices for implementing NCA ECC-1:2018 controls in AWS multi-account landing zones?",
-    body: "We are currently preparing for our third-party NCA Essential Cybersecurity Controls (ECC) audit for our Riyadh-based fintech. Specifically struggling with mapping cloud-native CloudTrail/GuardDuty aggregation into local on-prem SIEM for data residency compliance. Has anyone solved this without inflating data egress costs?",
+    id: "topic-101",
+    title: "Implementing NCA ECC-1:2018 in Multi-Account Cloud Environments: Log Residency & CloudTrail Aggregation",
+    body: "Fintechs and regulated entities in Saudi Arabia must comply with NCA Essential Cybersecurity Controls (ECC) regarding local data residency and continuous monitoring. How are teams handling multi-account CloudTrail and GuardDuty log export to local on-prem or local cloud region SIEMs (me-central-1) without incurring excessive NAT or egress charges? Share your architectural patterns and audit observations.",
     topic: "Compliance & Governance",
     country: "Saudi Arabia",
     author: {
-      name: "Tariq Al-Mansoor",
-      handle: "@tariq_sec",
-      role: "Lead Cloud Architect",
-      badge: "SOC 2 Practitioner",
+      name: "MENA Cloud Security Working Group",
+      handle: "@cloudsec_mena",
+      role: "Architecture Desk",
+      badge: "Discussion Topic",
       verified: true
     },
-    timestamp: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-    upvotes: 47,
-    downvotes: 1,
-    commentsCount: 14,
+    timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    upvotes: 0,
+    downvotes: 0,
+    commentsCount: 0,
     tags: ["NCA", "CloudSecurity", "AWS", "SaudiFintech", "Compliance"],
     isPinned: true,
-    isDemo: true,
-    comments: [
-      {
-        id: "comm-101-1",
-        postId: "post-101",
-        author: {
-          name: "Dr. Laila Haddad",
-          handle: "@lhaddad_ciso",
-          role: "Enterprise CISO"
-        },
-        timestamp: new Date(Date.now() - 2.5 * 3600 * 1000).toISOString(),
-        content: "We deployed local AWS Saudi Region (me-central-1) instances and feed CloudWatch metrics directly into a local OpenSearch cluster before filtering only high-severity alerts to the primary on-prem SIEM. Cuts egress by 80% and satisfies NCA clause 2-3-4.",
-        upvotes: 19
-      },
-      {
-        id: "comm-101-2",
-        postId: "post-101",
-        author: {
-          name: "Sami Kabbani",
-          handle: "@samik_dfir",
-          role: "Senior Security Engineer"
-        },
-        timestamp: new Date(Date.now() - 1 * 3600 * 1000).toISOString(),
-        content: "Seconding Dr. Laila's approach. Also make sure your KMS customer managed keys (CMKs) are tagged specifically per environment; NCA auditors asked for evidence of cryptographic separation during our last evaluation.",
-        upvotes: 9
-      }
-    ]
+    comments: []
   },
   {
-    id: "post-102",
-    title: "Wave of Telegram credential stealer campaigns spoofing UAE Federal Authority SMS notices",
-    body: "Seeing an uptick in smishing targeting consumers in Dubai and Sharjah claiming to be ICP (Federal Authority for Identity and Citizenship) fines. The landing pages clone the UAE Pass interface to siphon Emirates ID and OTP credentials. The IOCs link back to bulletproof hosting in Eastern Europe.",
+    id: "topic-102",
+    title: "Defending Government & Banking Portals Against Regional Reverse-Proxy Phishing Kits (AiTM)",
+    body: "Advisories across the GCC have noted threat actors deploying adversary-in-the-middle (AiTM) phishing frameworks that bypass standard SMS OTP and mobile application prompts by intercepting session cookies. What mitigations are organizations enforcing beyond FIDO2 / WebAuthn hardware keys, especially for legacy client environments?",
     topic: "Threat Intelligence",
     country: "United Arab Emirates",
     author: {
-      name: "Farah Al-Suwaidi",
-      handle: "@farah_intel",
-      role: "Threat Hunter",
-      badge: "aeCERT Contributor",
+      name: "Identity & Access Working Group",
+      handle: "@identity_defense",
+      role: "Threat Intel Desk",
+      badge: "Technical Exchange",
       verified: true
     },
-    timestamp: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
-    upvotes: 63,
-    downvotes: 2,
-    commentsCount: 19,
-    tags: ["UAEPass", "Phishing", "aeCERT", "ThreatIntel", "Smishing"],
-    isDemo: true,
-    comments: [
-      {
-        id: "comm-102-1",
-        postId: "post-102",
-        author: {
-          name: "Zaid Bin Rashid",
-          handle: "@zaid_redteam",
-          role: "Offensive Security Lead"
-        },
-        timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
-        content: "Good catch Farah. We analyzed the APKs pushed on Android redirects—it contains an SMS-forwarder background service using accessibility permissions. We forwarded the C2 IPs to aeCERT this morning.",
-        upvotes: 14
-      }
-    ]
+    timestamp: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+    upvotes: 0,
+    downvotes: 0,
+    commentsCount: 0,
+    tags: ["AiTM", "Phishing", "FIDO2", "aeCERT", "MFA"],
+    comments: []
   },
   {
-    id: "post-103",
-    title: "OT/SCADA isolation lessons learned: Protecting maritime telemetry from ransomware spillover",
-    body: "Following the recent Q-CERT advisory on edge gateway exploits, how are regional logistics and port operators handling remote maintenance for foreign OEM pump vendors without compromising Purdue Model Level 2/3 networks?",
+    id: "topic-103",
+    title: "OT/SCADA Perimeter Defense: Enforcing Zero-Trust Jump Hosts on Purdue Level 2/3 Industrial Networks",
+    body: "With critical infrastructure and maritime telemetry facing increased automated scanning, securing foreign OEM pump and turbine vendor remote sessions is critical. How are regional energy and utility operators enforcing ephemeral PAM credentials, session isolation, and video auditing without disrupting operational availability?",
     topic: "Industrial Control Systems",
     country: "Qatar",
     author: {
-      name: "Omar Al-Kuwari",
-      handle: "@omar_ics",
-      role: "Industrial Security Specialist",
-      badge: "GICSP Certified",
+      name: "Critical Infrastructure Security Group",
+      handle: "@ot_defense_mena",
+      role: "ICS Security Desk",
+      badge: "OT Defense",
       verified: true
     },
-    timestamp: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
-    upvotes: 38,
+    timestamp: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
+    upvotes: 0,
     downvotes: 0,
-    commentsCount: 8,
+    commentsCount: 0,
     tags: ["OTSecurity", "SCADA", "Q-CERT", "PurdueModel", "Maritime"],
-    isDemo: true,
-    comments: [
-      {
-        id: "comm-103-1",
-        postId: "post-103",
-        author: {
-          name: "Karim Mostafa",
-          handle: "@karim_ot",
-          role: "Automation Engineer"
-        },
-        timestamp: new Date(Date.now() - 9 * 3600 * 1000).toISOString(),
-        content: "We strictly mandate session-brokered jump hosts with video session recording (PAM) and ephemeral one-time credentials that expire after 2 hours. Dual-approver workflow required before any technician connects to L2 PLC programming consoles.",
-        upvotes: 12
-      }
-    ]
+    comments: []
   },
   {
-    id: "post-104",
-    title: "Discussion: Open-source Arabic threat intelligence feeds and MISP taxonomy sharing",
-    body: "Most public threat intel taxonomies focus on Western or East Asian actors. Are there community-curated MISP galaxies or ATT&CK navigation layers specifically tracking regional Gulf & Levant intrusion sets (Charming Kitten, MuddyWater, Lyceum, Agrius)? Let's compile a community list.",
+    id: "topic-104",
+    title: "Regional Threat Actor Attribution: Curating MENA MISP Feeds for MuddyWater, Agrius, and OilRig",
+    body: "Public global feeds often delay correlation for regional Middle East intrusion sets. Let's document open indicators, Yara rules, and MISP threat taxonomy galaxies focused on tracking regional persistent threats targeting government, financial, and telecommunication perimeters.",
     topic: "Research & Open Source",
     country: "Regional MENA",
     author: {
-      name: "Youssef Nabil",
-      handle: "@ynabil_sec",
-      role: "Security Researcher",
-      badge: "MISP Project Member",
+      name: "Open Threat Intelligence Initiative",
+      handle: "@osint_mena",
+      role: "Research Desk",
+      badge: "MISP Sharing",
       verified: true
     },
-    timestamp: new Date(Date.now() - 22 * 3600 * 1000).toISOString(),
-    upvotes: 55,
-    downvotes: 1,
-    commentsCount: 22,
+    timestamp: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    upvotes: 0,
+    downvotes: 0,
+    commentsCount: 0,
     tags: ["MISP", "ThreatIntel", "ATT&CK", "OpenSource", "MENA"],
-    isDemo: true,
     comments: []
   }
 ];

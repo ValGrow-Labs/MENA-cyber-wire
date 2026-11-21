@@ -17,7 +17,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-2 text-[11px] font-bold text-teal">
               <ShieldCheck className="w-4 h-4 text-teal" />
-              <span>Coastal Tech &middot; Light Edition</span>
+              <span>Independent Cybersecurity Journalism</span>
             </div>
           </div>
 
@@ -108,7 +108,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="pt-6 border-t border-slate-border flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-muted">
           <div>
-            &copy; {currentYear} MENA CYBER WIRE. Powered by the Coastal Tech UI/UX Design System.
+            &copy; {currentYear} MENA CYBER WIRE. Independent digital newsroom and regional cybersecurity intelligence index covering the Middle East and North Africa.
           </div>
           <div className="flex items-center gap-4 font-semibold text-ocean">
             <Link href="/" className="hover:text-teal">Feed</Link>

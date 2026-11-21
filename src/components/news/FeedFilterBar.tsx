@@ -1,6 +1,6 @@
 "use client";
 
-import { Flame, Clock, MessageSquare, AlertTriangle, LayoutGrid, List, UserCheck } from "lucide-react";
+import { Clock, AlertTriangle, ShieldCheck, UserCheck, LayoutGrid, List } from "lucide-react";
 import { MENA_COUNTRIES } from "@/lib/country/mena-countries";
 
 interface FilterBarProps {
@@ -28,15 +28,10 @@ export default function FeedFilterBar({
   viewMode,
   onViewModeChange,
 }: FilterBarProps) {
-  // Feed tabs from Section 9:
-  // - Latest Feed
-  // - Most Discussed
-  // - Trending
-  // - My Following
   const feedTabs = [
-    { id: "latest", label: "Latest Feed", icon: Clock },
-    { id: "discussed", label: "Most Discussed", icon: MessageSquare },
-    { id: "trending", label: "Trending", icon: Flame },
+    { id: "latest", label: "Latest Wire", icon: Clock },
+    { id: "severity", label: "High Severity", icon: AlertTriangle },
+    { id: "signal", label: "Verified Signals", icon: ShieldCheck },
     { id: "following", label: "My Following", icon: UserCheck },
   ];
 
@@ -81,7 +76,7 @@ export default function FeedFilterBar({
         <div className="flex items-center gap-1 p-0.5 rounded-lg bg-ice border border-slate-border">
           <button
             onClick={() => onViewModeChange("card")}
-            title="Card View (Visual Instagram + Reddit)"
+            title="Card View"
             className={`p-1.5 rounded-md transition-colors ${
               viewMode === "card"
                 ? "bg-white text-teal shadow-xs font-bold"
@@ -139,10 +134,10 @@ export default function FeedFilterBar({
           onChange={(e) => onStatusChange(e.target.value)}
           className="px-3 py-1.5 rounded-xl bg-ice border border-slate-border text-slate-dark focus:outline-hidden focus:border-teal font-medium"
         >
-          <option value="ALL">All Verification (Signal / Watch)</option>
+          <option value="ALL">All Editorial Classifications</option>
           <option value="SIGNAL">SIGNAL (Verified Intel)</option>
-          <option value="WATCH">WATCH (Developing Threat)</option>
-          <option value="UNVERIFIED">UNVERIFIED (Claims)</option>
+          <option value="WATCH">WATCH (Developing Incident)</option>
+          <option value="UNVERIFIED">UNVERIFIED (Third-party Claims)</option>
         </select>
       </div>
     </div>

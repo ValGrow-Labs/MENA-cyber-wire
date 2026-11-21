@@ -30,7 +30,8 @@ export default function Header() {
   
   // Notifications state
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [advisories, setAdvisories] = useState<any[]>([]);
 
   // Sign-in modal state
   const [showSignInModal, setShowSignInModal] = useState(false);
@@ -57,6 +58,16 @@ export default function Header() {
     };
     updateClock();
     const interval = setInterval(updateClock, 10000);
+
+    fetch("/api/advisories")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
+          setAdvisories(data.data.slice(0, 3));
+          setUnreadNotifications(Math.min(data.data.length, 3));
+        }
+      })
+      .catch(() => {});
 
     return () => {
       window.removeEventListener("mena_bookmarks_changed", updateBookmarks);
@@ -159,7 +170,7 @@ export default function Header() {
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-slate-border shadow-coastal-elevated p-4 z-50 space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-border">
                     <span className="text-xs font-bold uppercase tracking-wider text-ocean">
-                      Intelligence Notifications
+                      Government & CERT Advisories
                     </span>
                     <button
                       onClick={() => setShowNotifications(false)}
@@ -169,31 +180,40 @@ export default function Header() {
                     </button>
                   </div>
                   <div className="space-y-2 text-xs">
-                    <div className="p-2.5 rounded-lg bg-alert-light border border-alert-border">
-                      <div className="flex items-center justify-between font-bold text-alert-orange mb-1">
-                        <span>Emergency Advisory</span>
-                        <span className="text-[10px]">Just now</span>
+                    {advisories.length > 0 ? (
+                      advisories.map((adv: any, idx: number) => (
+                        <a
+                          key={adv.id || idx}
+                          href={adv.link || "/breaking"}
+                          target={adv.link ? "_blank" : undefined}
+                          rel={adv.link ? "noopener noreferrer" : undefined}
+                          className="block p-2.5 rounded-lg bg-ice border border-slate-border hover:border-teal/50 hover:bg-mist transition-all group"
+                        >
+                          <div className="flex items-center justify-between font-bold text-ocean mb-1">
+                            <span className="text-[10px] font-mono text-teal">
+                              {adv.source || "CISA"}
+                            </span>
+                            <span className="text-[10px] text-slate-muted">
+                              {adv.publishedDate ? new Date(adv.publishedDate).toLocaleDateString([], { month: "short", day: "numeric" }) : "Recent"}
+                            </span>
+                          </div>
+                          <p className="text-slate-dark text-[11px] leading-snug group-hover:text-teal font-medium">
+                            {adv.title}
+                          </p>
+                        </a>
+                      ))
+                    ) : (
+                      <div className="p-3 text-center text-slate-muted text-xs">
+                        No active emergency advisories at this time.
                       </div>
-                      <p className="text-slate-dark text-[11px] leading-snug">
-                        aeCERT warns of active exploitation of PAN-OS zero-days across GCC perimeters.
-                      </p>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-amber-light border border-amber-border">
-                      <div className="flex items-center justify-between font-bold text-amber-dark mb-1">
-                        <span>APT Campaign</span>
-                        <span className="text-[10px]">2h ago</span>
-                      </div>
-                      <p className="text-slate-dark text-[11px] leading-snug">
-                        MuddyWater spear-phishing campaign detected targeting Riyadh commercial banks.
-                      </p>
-                    </div>
+                    )}
                   </div>
                   <Link
                     href="/breaking"
                     onClick={() => setShowNotifications(false)}
                     className="block text-center text-xs font-bold text-teal hover:underline pt-1"
                   >
-                    View All Live Wire Alerts &rarr;
+                    View All Advisories & Wire Alerts &rarr;
                   </Link>
                 </div>
               )}
@@ -220,7 +240,7 @@ export default function Header() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-teal-border bg-teal-light text-teal text-xs font-bold hover:bg-teal hover:text-white transition-all shadow-xs"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Analyst Verified</span>
+                <span className="hidden sm:inline">Analyst Session</span>
               </button>
             ) : (
               <button
@@ -228,7 +248,7 @@ export default function Header() {
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-teal text-white hover:bg-teal-dark text-xs font-bold transition-all shadow-coastal"
               >
                 <User className="w-3.5 h-3.5" />
-                <span>Sign In</span>
+                <span>Analyst Portal</span>
               </button>
             )}
           </div>

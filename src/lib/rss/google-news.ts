@@ -165,7 +165,6 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.warn(`Google News RSS responded with status: ${response.status}. Using curated verified fallback.`);
       return CURATED_MENA_INTELLIGENCE;
     }
 
@@ -198,7 +197,7 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
       return {
         id: `gn-${idx}-${Math.abs(hashString(link))}`,
         title: cleanTitle,
-        description: rawDesc.length > 20 ? rawDesc : `Latest reporting on ${category.toLowerCase()} developments affecting cybersecurity infrastructure across the ${country} region.`,
+        description: rawDesc.length > 20 ? rawDesc : `Reporting on ${category.toLowerCase()} developments affecting digital assets in the ${country} region.`,
         sourceName: item.source?.["#text"] || sourceName,
         sourceUrl: item.link || "https://news.google.com",
         publishedAt: pubDate,
@@ -207,21 +206,10 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
         category,
         severity,
         verificationStatus,
-        tags: [country, category, "MENA", "Intelligence"].filter(Boolean),
-        upvotes: Math.floor(10 + (idx * 7) % 35),
-        commentCount: Math.floor(2 + (idx * 3) % 15),
-        readTime: `${Math.max(2, Math.min(6, Math.floor(cleanTitle.length / 15)))} min read`,
-        threatToAction: {
-          whatHappened: cleanTitle,
-          whoIsAffected: `Organizations and IT systems operating in ${country} and related regional supply chains.`,
-          whyItMatters: `Incident indicates active targeting in the ${category} vector that could affect operational uptime and data integrity.`,
-          whatShouldUsersDo: `Follow defense-in-depth guidance, verify external perimeter systems, and monitor official CERT advisories.`,
-          recommendedDefensiveActions: [
-            "Review perimeter firewall rules and audit public-facing ingress points.",
-            "Confirm multi-factor authentication enforcement on all administrative accounts.",
-            "Verify backup integrity and ensure snapshots are stored offline."
-          ]
-        },
+        tags: [country, category, "MENA"].filter(Boolean),
+        upvotes: 0,
+        commentCount: 0,
+        readTime: `${Math.max(2, Math.min(6, Math.floor(cleanTitle.length / 18)))} min read`,
         isDemo: false
       };
     });
@@ -232,8 +220,6 @@ export async function fetchGoogleNewsFeed(queryIndex: number = 0): Promise<NewsA
     return combined;
 
   } catch (err) {
-    console.warn("Failed to fetch live RSS feed:", err);
-    // Graceful fallback to verified curated intelligence
     return CURATED_MENA_INTELLIGENCE;
   }
 }

@@ -62,12 +62,12 @@ function CommunityPageContent() {
         verified: false,
       },
       timestamp: new Date().toISOString(),
-      upvotes: 1,
+      upvotes: 0,
       downvotes: 0,
-      userVote: "up",
+      userVote: null,
       commentsCount: 0,
       tags: newTags.split(",").map((t) => t.trim().replace(/^#/, "")).filter(Boolean),
-      isDemo: true,
+      isDemo: false,
       comments: [],
     };
 
@@ -143,7 +143,7 @@ function CommunityPageContent() {
             Practitioner Discussions & Tradecraft
           </h1>
           <p className="text-xs text-slate-muted max-w-xl leading-relaxed">
-            A Reddit-inspired regional exchange for CISOs, SOC analysts, and engineers. Share indicators, regulatory compliance tips (NCA ECC), and mitigation tactics.
+            A regional intelligence exchange for CISOs, SOC analysts, and security engineers. Share verified indicators, regulatory compliance practices (NCA ECC), and defensive tradecraft.
           </p>
         </div>
 

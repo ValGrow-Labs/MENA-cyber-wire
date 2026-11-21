@@ -174,7 +174,7 @@ export default function NavigationSidebar({ isMobile = false }: NavProps) {
         <div className="p-3.5 rounded-xl bg-mist border border-mist-border text-[11px] space-y-1.5 text-slate-dark">
           <div className="flex items-center gap-1.5 font-bold text-ocean">
             <ShieldCheck className="w-4 h-4 text-teal" />
-            <span>Coastal Tech Standard</span>
+            <span>Verified Editorial Standard</span>
           </div>
           <p className="text-slate-muted leading-relaxed">
             Directly connected to national CERT advisories and NVD records. Pure verified reporting with zero synthetic news.
