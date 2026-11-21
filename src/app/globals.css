@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #F7FAFC; /* Ice White */
+  --bg-surface: #FFFFFF; /* Pure White */
+  --bg-secondary: #E5F2F5; /* Mist Blue */
+  --text-primary: #1D2939; /* Dark Slate */
+  --text-secondary: #68788A; /* Muted Slate */
+  --brand-teal: #087E8B; /* Deep Teal */
+  --brand-ocean: #183B56; /* Ocean Blue */
+  --accent-amber: #F2B45B; /* Desert Amber */
+  --alert-orange: #E45B48; /* Alert Orange */
+  --border-subtle: #DCE6EC; /* Soft Blue Grey */
+}
+
+/* Base Light Theme */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Refined, elegant scrollbar for Coastal Tech */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7FAFC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C8DFE6;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #087E8B;
+}
+
+/* Editorial selection */
+::selection {
+  background-color: #E5F2F5;
+  color: #087E8B;
+}
+
+/* Badge classes */
+.badge-signal {
+  background-color: #FDF2F0;
+  color: #E45B48;
+  border: 1px solid #F6BEB7;
+}
+
+.badge-watch {
+  background-color: #FEF7ED;
+  color: #C68832;
+  border: 1px solid #FAD9A6;
+}
+
+.badge-unverified {
+  background-color: #EDF2F7;
+  color: #68788A;
+  border: 1px solid #DCE6EC;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
