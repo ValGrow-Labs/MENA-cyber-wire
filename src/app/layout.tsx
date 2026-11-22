@@ -3,11 +3,9 @@ import "./globals.css";
 import { Newsreader, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 
 const sans = Source_Sans_3({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["normal", "italic"] });
+const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["normal", "italic"], adjustFontFallback: false });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500"], display: "swap" });
-import Header from "@/components/layout/Header";
-import PageShell from "@/components/layout/PageShell";
-import Footer from "@/components/layout/Footer";
+import PublicLayoutWrapper from "@/components/layout/PublicLayoutWrapper";
 import { themeInitScript } from "@/components/shared/ThemeToggle";
 
 export const viewport: Viewport = {
@@ -52,11 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="flex min-h-dvh flex-col">
-        <Header />
-
-        <PageShell>{children}</PageShell>
-
-        <Footer />
+        <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
       </body>
     </html>
   );

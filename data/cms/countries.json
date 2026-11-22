@@ -1,0 +1,421 @@
+[
+  {
+    "code": "AE",
+    "name": "United Arab Emirates",
+    "nativeName": "الإمارات العربية المتحدة",
+    "region": "Gulf",
+    "flag": "🇦🇪",
+    "certAgency": "UAE Cybersecurity Council / aeCERT (TDRA)",
+    "threatLevel": "Elevated",
+    "activeIncidents": 4,
+    "criticalInfrastructureSectors": [
+      "Fintech & Banking",
+      "Aviation & Logistics",
+      "Energy",
+      "Smart Cities"
+    ],
+    "summary": "The UAE Cybersecurity Council, set up in 2020, leads national cyber policy, while aeCERT handles incident response under the telecoms regulator TDRA. Personal data is governed by Federal Decree-Law No. 45 of 2021; financial free zones such as DIFC and ADGM run their own data protection regimes.",
+    "recentAdvisories": 12,
+    "coordinates": {
+      "x": 74,
+      "y": 55
+    },
+    "slug": "united-arab-emirates",
+    "cybersecurityAgency": "UAE Cybersecurity Council / aeCERT (TDRA)",
+    "regulatoryFramework": "The UAE Cybersecurity Council, set up in 2020, leads national cyber policy, while aeCERT handles incident response under the telecoms regulator TDRA. Personal data is governed by Federal Decree-Law No. 45 of 2021; financial free zones such as DIFC and ADGM run their own data protection regimes.",
+    "cybersecurityLaws": [
+      "Federal Decree-Law No. 45 of 2021 on Personal Data"
+    ],
+    "editorialSummary": "The UAE Cybersecurity Council, set up in 2020, leads national cyber policy, while aeCERT handles incident response under the telecoms regulator TDRA. Personal data is governed by Federal Decree-Law No. 45 of 2021; financial free zones such as DIFC and ADGM run their own data protection regimes.",
+    "pageMetadata": {
+      "metaTitle": "United Arab Emirates Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for United Arab Emirates."
+    }
+  },
+  {
+    "code": "SA",
+    "name": "Saudi Arabia",
+    "nativeName": "المملكة العربية السعودية",
+    "region": "Gulf",
+    "flag": "🇸🇦",
+    "certAgency": "National Cybersecurity Authority (NCA)",
+    "threatLevel": "High",
+    "activeIncidents": 7,
+    "criticalInfrastructureSectors": [
+      "Oil & Petrochemicals",
+      "Government & Vision 2030",
+      "Giga-projects",
+      "Defense"
+    ],
+    "summary": "The National Cybersecurity Authority was established in 2017 and issues the Essential Cybersecurity Controls (ECC) that government bodies and critical infrastructure must follow. The Personal Data Protection Law, overseen by SDAIA, came into force in September 2023.",
+    "recentAdvisories": 19,
+    "coordinates": {
+      "x": 62,
+      "y": 58
+    },
+    "slug": "saudi-arabia",
+    "cybersecurityAgency": "National Cybersecurity Authority (NCA)",
+    "regulatoryFramework": "The National Cybersecurity Authority was established in 2017 and issues the Essential Cybersecurity Controls (ECC) that government bodies and critical infrastructure must follow. The Personal Data Protection Law, overseen by SDAIA, came into force in September 2023.",
+    "cybersecurityLaws": [
+      "Personal Data Protection Law (PDPL - SDAIA)"
+    ],
+    "editorialSummary": "The National Cybersecurity Authority was established in 2017 and issues the Essential Cybersecurity Controls (ECC) that government bodies and critical infrastructure must follow. The Personal Data Protection Law, overseen by SDAIA, came into force in September 2023.",
+    "pageMetadata": {
+      "metaTitle": "Saudi Arabia Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Saudi Arabia."
+    }
+  },
+  {
+    "code": "QA",
+    "name": "Qatar",
+    "nativeName": "قطر",
+    "region": "Gulf",
+    "flag": "🇶🇦",
+    "certAgency": "National Cyber Security Agency (NCSA) / Q-CERT",
+    "threatLevel": "Elevated",
+    "activeIncidents": 3,
+    "criticalInfrastructureSectors": [
+      "LNG & Energy",
+      "Sovereign Wealth & Banking",
+      "Media & Telecom"
+    ],
+    "summary": "The National Cyber Security Agency leads Qatar's cyber security policy and incident response. In 2016 Qatar became the first GCC state to pass a general personal data protection law (Law No. 13 of 2016).",
+    "recentAdvisories": 9,
+    "coordinates": {
+      "x": 68,
+      "y": 53
+    },
+    "slug": "qatar",
+    "cybersecurityAgency": "National Cyber Security Agency (NCSA) / Q-CERT",
+    "regulatoryFramework": "The National Cyber Security Agency leads Qatar's cyber security policy and incident response. In 2016 Qatar became the first GCC state to pass a general personal data protection law (Law No. 13 of 2016).",
+    "cybersecurityLaws": [
+      "Law No. 13 of 2016 on Personal Data Protection"
+    ],
+    "editorialSummary": "The National Cyber Security Agency leads Qatar's cyber security policy and incident response. In 2016 Qatar became the first GCC state to pass a general personal data protection law (Law No. 13 of 2016).",
+    "pageMetadata": {
+      "metaTitle": "Qatar Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Qatar."
+    }
+  },
+  {
+    "code": "EG",
+    "name": "Egypt",
+    "nativeName": "جمهورية مصر العربية",
+    "region": "North Africa",
+    "flag": "🇪🇬",
+    "certAgency": "EG-CERT (NTRA)",
+    "threatLevel": "High",
+    "activeIncidents": 6,
+    "criticalInfrastructureSectors": [
+      "Suez Canal & Shipping",
+      "Banking & Mobile Wallets",
+      "Telecom",
+      "Government Portals"
+    ],
+    "summary": "EG-CERT, run by the National Telecom Regulatory Authority, is Egypt's national incident response team, and the Supreme Council for Cyber Security sets national strategy. Personal data is covered by Law No. 151 of 2020.",
+    "recentAdvisories": 14,
+    "coordinates": {
+      "x": 42,
+      "y": 48
+    },
+    "slug": "egypt",
+    "cybersecurityAgency": "EG-CERT (NTRA)",
+    "regulatoryFramework": "EG-CERT, run by the National Telecom Regulatory Authority, is Egypt's national incident response team, and the Supreme Council for Cyber Security sets national strategy. Personal data is covered by Law No. 151 of 2020.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "EG-CERT, run by the National Telecom Regulatory Authority, is Egypt's national incident response team, and the Supreme Council for Cyber Security sets national strategy. Personal data is covered by Law No. 151 of 2020.",
+    "pageMetadata": {
+      "metaTitle": "Egypt Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Egypt."
+    }
+  },
+  {
+    "code": "KW",
+    "name": "Kuwait",
+    "nativeName": "الكويت",
+    "region": "Gulf",
+    "flag": "🇰🇼",
+    "certAgency": "National Cyber Security Center (NCSC)",
+    "threatLevel": "Elevated",
+    "activeIncidents": 3,
+    "criticalInfrastructureSectors": [
+      "Petroleum & Refining",
+      "Financial Services",
+      "Maritime Trade"
+    ],
+    "summary": "Kuwait's National Cyber Security Center coordinates national incident response and policy. The telecoms regulator CITRA has issued data privacy rules for service providers.",
+    "recentAdvisories": 8,
+    "coordinates": {
+      "x": 66,
+      "y": 46
+    },
+    "slug": "kuwait",
+    "cybersecurityAgency": "National Cyber Security Center (NCSC)",
+    "regulatoryFramework": "Kuwait's National Cyber Security Center coordinates national incident response and policy. The telecoms regulator CITRA has issued data privacy rules for service providers.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Kuwait's National Cyber Security Center coordinates national incident response and policy. The telecoms regulator CITRA has issued data privacy rules for service providers.",
+    "pageMetadata": {
+      "metaTitle": "Kuwait Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Kuwait."
+    }
+  },
+  {
+    "code": "BH",
+    "name": "Bahrain",
+    "nativeName": "البحرين",
+    "region": "Gulf",
+    "flag": "🇧🇭",
+    "certAgency": "National Cyber Security Center (NCSC)",
+    "threatLevel": "Guarded",
+    "activeIncidents": 2,
+    "criticalInfrastructureSectors": [
+      "Islamic Banking & Fintech",
+      "Aluminum & Heavy Industry",
+      "Government"
+    ],
+    "summary": "Bahrain's National Cyber Security Center was established by royal decree in 2020. The Personal Data Protection Law (Law No. 30 of 2018) was one of the region's earliest general data protection laws.",
+    "recentAdvisories": 6,
+    "coordinates": {
+      "x": 67,
+      "y": 51
+    },
+    "slug": "bahrain",
+    "cybersecurityAgency": "National Cyber Security Center (NCSC)",
+    "regulatoryFramework": "Bahrain's National Cyber Security Center was established by royal decree in 2020. The Personal Data Protection Law (Law No. 30 of 2018) was one of the region's earliest general data protection laws.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Bahrain's National Cyber Security Center was established by royal decree in 2020. The Personal Data Protection Law (Law No. 30 of 2018) was one of the region's earliest general data protection laws.",
+    "pageMetadata": {
+      "metaTitle": "Bahrain Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Bahrain."
+    }
+  },
+  {
+    "code": "OM",
+    "name": "Oman",
+    "nativeName": "سلطنة عمان",
+    "region": "Gulf",
+    "flag": "🇴🇲",
+    "certAgency": "Oman National CERT (OCERT)",
+    "threatLevel": "Guarded",
+    "activeIncidents": 2,
+    "criticalInfrastructureSectors": [
+      "Ports & Maritime Logistics",
+      "Oil & Gas Distribution",
+      "Telecom"
+    ],
+    "summary": "Oman's national CERT has operated since 2010 and also hosts a regional cyber security centre with the ITU. A Personal Data Protection Law was issued by Royal Decree 6/2022.",
+    "recentAdvisories": 7,
+    "coordinates": {
+      "x": 78,
+      "y": 64
+    },
+    "slug": "oman",
+    "cybersecurityAgency": "Oman National CERT (OCERT)",
+    "regulatoryFramework": "Oman's national CERT has operated since 2010 and also hosts a regional cyber security centre with the ITU. A Personal Data Protection Law was issued by Royal Decree 6/2022.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Oman's national CERT has operated since 2010 and also hosts a regional cyber security centre with the ITU. A Personal Data Protection Law was issued by Royal Decree 6/2022.",
+    "pageMetadata": {
+      "metaTitle": "Oman Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Oman."
+    }
+  },
+  {
+    "code": "JO",
+    "name": "Jordan",
+    "nativeName": "الأردن",
+    "region": "Levant",
+    "flag": "🇯🇴",
+    "certAgency": "National Cyber Security Center (NCSC)",
+    "threatLevel": "Elevated",
+    "activeIncidents": 4,
+    "criticalInfrastructureSectors": [
+      "Technology Outsourcing",
+      "Banking",
+      "Health Informatics"
+    ],
+    "summary": "Jordan's Cybersecurity Law of 2019 created the National Cyber Security Center to set standards and coordinate incident response. A personal data protection law followed in 2023.",
+    "recentAdvisories": 11,
+    "coordinates": {
+      "x": 49,
+      "y": 43
+    },
+    "slug": "jordan",
+    "cybersecurityAgency": "National Cyber Security Center (NCSC)",
+    "regulatoryFramework": "Jordan's Cybersecurity Law of 2019 created the National Cyber Security Center to set standards and coordinate incident response. A personal data protection law followed in 2023.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Jordan's Cybersecurity Law of 2019 created the National Cyber Security Center to set standards and coordinate incident response. A personal data protection law followed in 2023.",
+    "pageMetadata": {
+      "metaTitle": "Jordan Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Jordan."
+    }
+  },
+  {
+    "code": "LB",
+    "name": "Lebanon",
+    "nativeName": "لبنان",
+    "region": "Levant",
+    "flag": "🇱🇧",
+    "certAgency": "ISF Cybercrime Bureau",
+    "threatLevel": "High",
+    "activeIncidents": 5,
+    "criticalInfrastructureSectors": [
+      "Telecommunications",
+      "Banking Infrastructure",
+      "Power Grid"
+    ],
+    "summary": "Lebanon has no fully operational national CERT; many investigations fall to the Internal Security Forces' cybercrime bureau. Its economic crisis has strained public-sector IT budgets and maintenance.",
+    "recentAdvisories": 5,
+    "coordinates": {
+      "x": 50,
+      "y": 38
+    },
+    "slug": "lebanon",
+    "cybersecurityAgency": "ISF Cybercrime Bureau",
+    "regulatoryFramework": "Lebanon has no fully operational national CERT; many investigations fall to the Internal Security Forces' cybercrime bureau. Its economic crisis has strained public-sector IT budgets and maintenance.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Lebanon has no fully operational national CERT; many investigations fall to the Internal Security Forces' cybercrime bureau. Its economic crisis has strained public-sector IT budgets and maintenance.",
+    "pageMetadata": {
+      "metaTitle": "Lebanon Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Lebanon."
+    }
+  },
+  {
+    "code": "IQ",
+    "name": "Iraq",
+    "nativeName": "العراق",
+    "region": "Levant",
+    "flag": "🇮🇶",
+    "certAgency": "Not confirmed",
+    "threatLevel": "High",
+    "activeIncidents": 5,
+    "criticalInfrastructureSectors": [
+      "Energy Extraction",
+      "Cross-border Telecom",
+      "Government"
+    ],
+    "summary": "Iraq has no comprehensive cybercrime or data protection law in force. A draft cybercrime law has been debated in parliament for years and criticised by press-freedom groups.",
+    "recentAdvisories": 7,
+    "coordinates": {
+      "x": 58,
+      "y": 39
+    },
+    "slug": "iraq",
+    "cybersecurityAgency": "Not confirmed",
+    "regulatoryFramework": "Iraq has no comprehensive cybercrime or data protection law in force. A draft cybercrime law has been debated in parliament for years and criticised by press-freedom groups.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Iraq has no comprehensive cybercrime or data protection law in force. A draft cybercrime law has been debated in parliament for years and criticised by press-freedom groups.",
+    "pageMetadata": {
+      "metaTitle": "Iraq Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Iraq."
+    }
+  },
+  {
+    "code": "MA",
+    "name": "Morocco",
+    "nativeName": "المملكة المغربية",
+    "region": "North Africa",
+    "flag": "🇲🇦",
+    "certAgency": "DGSSI / maCERT",
+    "threatLevel": "Elevated",
+    "activeIncidents": 3,
+    "criticalInfrastructureSectors": [
+      "Automotive & Aerospace Manufacturing",
+      "Banking",
+      "Renewable Energy"
+    ],
+    "summary": "The DGSSI, attached to the National Defence Administration, sets cyber security policy and runs maCERT. Law 05-20 (2020) covers cyber security, and Law 09-08 on personal data is enforced by the CNDP.",
+    "recentAdvisories": 10,
+    "coordinates": {
+      "x": 12,
+      "y": 35
+    },
+    "slug": "morocco",
+    "cybersecurityAgency": "DGSSI / maCERT",
+    "regulatoryFramework": "The DGSSI, attached to the National Defence Administration, sets cyber security policy and runs maCERT. Law 05-20 (2020) covers cyber security, and Law 09-08 on personal data is enforced by the CNDP.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "The DGSSI, attached to the National Defence Administration, sets cyber security policy and runs maCERT. Law 05-20 (2020) covers cyber security, and Law 09-08 on personal data is enforced by the CNDP.",
+    "pageMetadata": {
+      "metaTitle": "Morocco Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Morocco."
+    }
+  },
+  {
+    "code": "TN",
+    "name": "Tunisia",
+    "nativeName": "الجمهورية التونسية",
+    "region": "North Africa",
+    "flag": "🇹🇳",
+    "certAgency": "ANCS (formerly ANSI) / tunCERT",
+    "threatLevel": "Guarded",
+    "activeIncidents": 2,
+    "criticalInfrastructureSectors": [
+      "Public Administration",
+      "Postal Banking",
+      "Higher Education"
+    ],
+    "summary": "Tunisia replaced its national IT security agency ANSI with the National Cybersecurity Agency (ANCS) in 2023; tunCERT is its response team. Personal data has been protected by law since 2004, overseen by the INPDP.",
+    "recentAdvisories": 6,
+    "coordinates": {
+      "x": 26,
+      "y": 28
+    },
+    "slug": "tunisia",
+    "cybersecurityAgency": "ANCS (formerly ANSI) / tunCERT",
+    "regulatoryFramework": "Tunisia replaced its national IT security agency ANSI with the National Cybersecurity Agency (ANCS) in 2023; tunCERT is its response team. Personal data has been protected by law since 2004, overseen by the INPDP.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "Tunisia replaced its national IT security agency ANSI with the National Cybersecurity Agency (ANCS) in 2023; tunCERT is its response team. Personal data has been protected by law since 2004, overseen by the INPDP.",
+    "pageMetadata": {
+      "metaTitle": "Tunisia Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Tunisia."
+    }
+  },
+  {
+    "code": "DZ",
+    "name": "Algeria",
+    "nativeName": "الجمهورية الجزائرية",
+    "region": "North Africa",
+    "flag": "🇩🇿",
+    "certAgency": "Agence de la sécurité des systèmes d'information",
+    "threatLevel": "Elevated",
+    "activeIncidents": 3,
+    "criticalInfrastructureSectors": [
+      "Hydrocarbons & Pipelines",
+      "State Banking",
+      "Telecommunications"
+    ],
+    "summary": "A 2020 presidential decree set up a national council and agency for information systems security. Law 18-07 of 2018 governs personal data protection.",
+    "recentAdvisories": 5,
+    "coordinates": {
+      "x": 20,
+      "y": 38
+    },
+    "slug": "algeria",
+    "cybersecurityAgency": "Agence de la sécurité des systèmes d'information",
+    "regulatoryFramework": "A 2020 presidential decree set up a national council and agency for information systems security. Law 18-07 of 2018 governs personal data protection.",
+    "cybersecurityLaws": [
+      "National Cybersecurity Policy & Critical Sector Guidelines"
+    ],
+    "editorialSummary": "A 2020 presidential decree set up a national council and agency for information systems security. Law 18-07 of 2018 governs personal data protection.",
+    "pageMetadata": {
+      "metaTitle": "Algeria Cybersecurity Profile & Threat Telemetry | MENA Cyber Wire",
+      "metaDescription": "Real-time cyber threat posture, national CERT directives, and critical infrastructure analysis for Algeria."
+    }
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "cat-1",
+    "name": "Ransomware",
+    "slug": "ransomware",
+    "description": "Ransomware syndicates, double-extortion campaigns, and decryptor telemetry.",
+    "order": 1,
+    "isEnabled": true,
+    "colorHex": "#E52D27",
+    "icon": "Lock"
+  },
+  {
+    "id": "cat-2",
+    "name": "Data Breach",
+    "slug": "data-breach",
+    "description": "Regional enterprise and government leaks, stolen credentials, and dark web disclosures.",
+    "order": 2,
+    "isEnabled": true,
+    "colorHex": "#F2B45B",
+    "icon": "Database"
+  },
+  {
+    "id": "cat-3",
+    "name": "Critical Infrastructure",
+    "slug": "critical-infrastructure",
+    "description": "Attacks on energy grids, desalination plants, ports, and ICS/SCADA systems.",
+    "order": 3,
+    "isEnabled": true,
+    "colorHex": "#E45B48",
+    "icon": "Cpu"
+  },
+  {
+    "id": "cat-4",
+    "name": "Espionage & APT",
+    "slug": "espionage-apt",
+    "description": "State-sponsored cyber espionage campaigns in the Middle East & North Africa.",
+    "order": 4,
+    "isEnabled": true,
+    "colorHex": "#9B51E0",
+    "icon": "Eye"
+  },
+  {
+    "id": "cat-5",
+    "name": "Vulnerability",
+    "slug": "vulnerability",
+    "description": "Zero-days, edge appliances (PAN-OS, Ivanti, FortiOS), and active KEV exploits.",
+    "order": 5,
+    "isEnabled": true,
+    "colorHex": "#EB5757",
+    "icon": "AlertTriangle"
+  },
+  {
+    "id": "cat-6",
+    "name": "Fintech & Banking",
+    "slug": "fintech-banking",
+    "description": "Financial cyber threats, SWIFT anomalies, ATM malware, and payment gateway security.",
+    "order": 6,
+    "isEnabled": true,
+    "colorHex": "#27AE60",
+    "icon": "CreditCard"
+  },
+  {
+    "id": "cat-7",
+    "name": "Cloud & AI",
+    "slug": "cloud-ai",
+    "description": "AI security risks, cloud tenant compromises, and LLM adversarial exploitation.",
+    "order": 7,
+    "isEnabled": true,
+    "colorHex": "#2D9CDB",
+    "icon": "Cloud"
+  },
+  {
+    "id": "cat-8",
+    "name": "Policy & Regulation",
+    "slug": "policy-regulation",
+    "description": "NCA ECC compliance, UAE Federal Decree-Law 45, Qatar Law 13, and CERT directives.",
+    "order": 8,
+    "isEnabled": true,
+    "colorHex": "#087E8B",
+    "icon": "Shield"
+  }
+]

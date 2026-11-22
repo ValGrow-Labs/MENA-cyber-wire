@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MENA_COUNTRIES } from "@/lib/country/mena-countries";
 import { CountryData } from "@/types/country";
@@ -15,8 +15,19 @@ const REGIONS: CountryData["region"][] = ["Gulf", "Levant", "North Africa"];
 
 /** Country desks: an index grouped by region on the left, the selected dossier on the right. */
 export default function CountryImpactMap({ onSelectCountry, selectedCountryCode }: Props) {
+  const [countries, setCountries] = useState<CountryData[]>(MENA_COUNTRIES);
   const [active, setActive] = useState(selectedCountryCode || "SA");
-  const current = MENA_COUNTRIES.find((c) => c.code === active) || MENA_COUNTRIES[0];
+
+  useEffect(() => {
+    fetch("/api/countries")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d?.data) && d.data.length > 0) setCountries(d.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const current = countries.find((c) => c.code === active) || countries[0];
 
   const pick = (c: CountryData) => {
     setActive(c.code);
@@ -35,7 +46,7 @@ export default function CountryImpactMap({ onSelectCountry, selectedCountryCode 
       <div className="grid gap-8 md:grid-cols-12">
         <div className="md:col-span-5">
           {REGIONS.map((region) => {
-            const list = MENA_COUNTRIES.filter((c) => c.region === region);
+            const list = countries.filter((c) => c.region === region);
             if (!list.length) return null;
             return (
               <div key={region} className="mb-4 last:mb-0">

@@ -50,10 +50,12 @@ export default function DailyBriefPage() {
   useEffect(() => {
     setPulse(getTodayCyberPulse());
     Promise.all([
-      fetch("/api/news?sortBy=latest").then((r) => r.json()),
-      fetch("/api/vulnerabilities?severity=CRITICAL").then((r) => r.json()),
+      fetch("/api/cyber-pulse").then((r) => r.json()).catch(() => null),
+      fetch("/api/news?sortBy=latest").then((r) => r.json()).catch(() => null),
+      fetch("/api/vulnerabilities?severity=CRITICAL").then((r) => r.json()).catch(() => null),
     ])
-      .then(([newsData, cveData]) => {
+      .then(([pulseData, newsData, cveData]) => {
+        if (pulseData?.pulse) setPulse(pulseData.pulse);
         if (Array.isArray(newsData?.data)) setTopStories(newsData.data.slice(0, 5));
         if (Array.isArray(cveData?.data)) setTopCves(cveData.data.slice(0, 3));
       })
@@ -171,7 +173,7 @@ export default function DailyBriefPage() {
 
         <Section n={4} title="This week's checklist">
           <ol className="space-y-3">
-            {ACTIONS.map((a, i) => (
+            {(pulse?.recommendedDefensiveActions || ACTIONS).map((a, i) => (
               <li key={i} className="flex gap-3 text-[0.9375rem] leading-relaxed text-ink-2">
                 <span className="font-mono text-2xs leading-6 text-ink-3 tabular">{String(i + 1).padStart(2, "0")}</span>
                 <span>{a}</span>

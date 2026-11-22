@@ -1,0 +1,14 @@
+[
+  {
+    "id": "usr-admin-01",
+    "name": "Senior Cyber Desk Editor",
+    "email": "admin@menacyberwire.com",
+    "passwordHash": "2f9aa498404408180b4ce4cdb2fece0e31ed5adb69c6411d3bc278b4e7fe74a50fac79aa079e5a8fb1efa513a26a9162fdd54f2bfcc1a329859e995944cd275d",
+    "salt": "154040ebf060ab26d78a0686ac0126e5",
+    "role": "SUPER_ADMIN",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+    "createdAt": "2026-11-22T11:52:48.382Z",
+    "isActive": true,
+    "lastLoginAt": "2026-11-22T11:55:39.887Z"
+  }
+]

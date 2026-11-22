@@ -1,0 +1,35 @@
+[
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
+    "id": "log-1795348539987-228",
+    "timestamp": "2026-11-22T11:55:39.987Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
+    "id": "log-1795348368467-7",
+    "timestamp": "2026-11-22T11:52:48.467Z"
+  },
+  {
+    "id": "log-init-01",
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "SYSTEM_INITIALIZE",
+    "targetType": "CMS",
+    "targetTitle": "MENA Cyber Wire CMS Initialized",
+    "details": "Initialized secure database, regional desks, threat actors, and default configurations.",
+    "timestamp": "2026-11-22T11:52:48.466Z"
+  }
+]

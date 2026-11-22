@@ -36,6 +36,7 @@ function LevelBars({ level, inverted = false }: { level: number; inverted?: bool
 
 function MenaWatchContent() {
   const searchParams = useSearchParams();
+  const [countries, setCountries] = useState<CountryData[]>(MENA_COUNTRIES);
   const [selected, setSelected] = useState<CountryData>(
     () => findCountry(searchParams.get("country")) || MENA_COUNTRIES.find((c) => c.code === "SA") || MENA_COUNTRIES[0]
   );
@@ -44,9 +45,28 @@ function MenaWatchContent() {
   const [followed, setFollowed] = useState<string[]>([]);
 
   useEffect(() => {
-    const match = findCountry(searchParams.get("country"));
+    fetch("/api/countries")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d?.data) && d.data.length > 0) {
+          setCountries(d.data);
+          const currentCode = selected.code;
+          const updated = d.data.find((c: CountryData) => c.code === currentCode);
+          if (updated) setSelected(updated);
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const match = countries.find(
+      (x) =>
+        x.code.toLowerCase() === searchParams.get("country")?.toLowerCase() ||
+        x.name.toLowerCase() === searchParams.get("country")?.toLowerCase()
+    );
     if (match) setSelected(match);
-  }, [searchParams]);
+  }, [searchParams, countries]);
 
   useEffect(() => {
     const sync = () => setFollowed(LocalStore.getFollowedCountries());
@@ -95,7 +115,7 @@ function MenaWatchContent() {
         {/* Index */}
         <nav aria-label="Countries" className="md:col-span-4">
           {REGIONS.map((region) => {
-            const list = MENA_COUNTRIES.filter((c) => c.region === region);
+            const list = countries.filter((c) => c.region === region);
             if (!list.length) return null;
             return (
               <div key={region} className="mb-6 last:mb-0">

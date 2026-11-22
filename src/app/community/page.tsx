@@ -40,6 +40,17 @@ function CommunityPageContent() {
   const [commentError, setCommentError] = useState("");
 
   useEffect(() => {
+    fetch("/api/community")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d?.data) && d.data.length > 0) {
+          setPosts(d.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (highlightedPostId) {
       const match = posts.find((p) => p.id === highlightedPostId);
       if (match) setActivePost(match);

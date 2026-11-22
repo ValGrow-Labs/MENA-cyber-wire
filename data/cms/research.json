@@ -1,0 +1,185 @@
+[
+  {
+    "id": "actor-muddywater",
+    "name": "MuddyWater",
+    "aliases": "Mango Sandstorm, Seedworm, Static Kitten, MERCURY",
+    "origin": "Iranian state (MOIS)",
+    "region": "Middle East, North Africa, Global",
+    "targetSectors": [
+      "Government",
+      "Telecommunications",
+      "Energy",
+      "Defense",
+      "Municipalities"
+    ],
+    "description": "A state-sponsored cyber espionage operator subordinate to Iran's Ministry of Intelligence and Security (MOIS), actively targeting entities across the GCC and Levant.",
+    "threatProfile": "Utilizes spear-phishing with malicious document lures, legitimate remote management software (ScreenConnect, Syncro, Atera), and custom backdoors including POWERSTATS and Small Sieve.",
+    "tactics": [
+      "Initial Access via Spear-phishing",
+      "Execution via Living-off-the-Land Binaries",
+      "Persistence via Scheduled Tasks"
+    ],
+    "techniques": [
+      "T1566 Spearphishing Attachment",
+      "T1059 Command and Scripting Interpreter",
+      "T1219 Remote Access Software"
+    ],
+    "procedures": [
+      "Masquerading as telecom or government regulatory memos to trick regional administrators."
+    ],
+    "indicators": [
+      "powershell.exe -w hidden -enc ...",
+      "C:\\ProgramData\\syncro.exe"
+    ],
+    "relatedIncidents": [
+      "GCC Government Phishing Wave",
+      "Regional ISP Compromise"
+    ],
+    "references": [
+      {
+        "title": "CISA / FBI Joint Advisory AA22-055A",
+        "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-055a"
+      }
+    ],
+    "author": "MENA Cyber Wire Intelligence Desk",
+    "lastUpdated": "2026-11-22T11:53:03.542Z",
+    "publicationStatus": "Published",
+    "isFeatured": true
+  },
+  {
+    "id": "actor-oilrig",
+    "name": "OilRig",
+    "aliases": "APT34, Helix Kitten, Hazel Sandstorm, EUROPIUM",
+    "origin": "Iran-linked",
+    "region": "Middle East",
+    "targetSectors": [
+      "Financial",
+      "Energy",
+      "Government",
+      "Chemicals",
+      "Telecom"
+    ],
+    "description": "Publicly tracked since at least 2014, OilRig focuses on long-term espionage across high-value Arabian Gulf institutions.",
+    "threatProfile": "Pioneered DNS tunneling for covert command-and-control communication and uses faux recruiter profiles on LinkedIn for initial access.",
+    "tactics": [
+      "Social Engineering",
+      "DNS Tunneling C2",
+      "Web Shell Persistence"
+    ],
+    "techniques": [
+      "T1071.004 DNS C2",
+      "T1505.003 Web Shell",
+      "T1056 Input Capture"
+    ],
+    "procedures": [
+      "Placing web shells on internet-facing Outlook Web Access (OWA) servers."
+    ],
+    "indicators": [
+      "nslookup query.c2.domain.org",
+      "tunnel.ps1"
+    ],
+    "relatedIncidents": [
+      "Gulf Financial Services Infiltration",
+      "Energy Ministry Inquiries"
+    ],
+    "references": [
+      {
+        "title": "MITRE ATT&CK OilRig (G0049)",
+        "url": "https://attack.mitre.org/groups/G0049/"
+      }
+    ],
+    "author": "MENA Cyber Wire Intelligence Desk",
+    "lastUpdated": "2026-11-22T11:53:03.542Z",
+    "publicationStatus": "Published",
+    "isFeatured": true
+  },
+  {
+    "id": "actor-shamoon",
+    "name": "Shamoon (Disttrack) Operators",
+    "aliases": "Wiper campaigns of 2012, 2016-17, and 2018",
+    "origin": "Attributed to Iran-linked operators",
+    "region": "Saudi Arabia & GCC",
+    "targetSectors": [
+      "Oil & Petrochemicals",
+      "Government Agencies",
+      "Desalination"
+    ],
+    "description": "Responsible for some of the most destructive cyber attacks in regional history, completely destroying hard drives and master boot records.",
+    "threatProfile": "Payload consists of a wiper, dropper, and reporter component. Replaces master boot records with an image (e.g., the burning flag or Alan Kurdi) and overwrites file structures.",
+    "tactics": [
+      "Destructive Malware",
+      "Credential Theft",
+      "Network Propagation"
+    ],
+    "techniques": [
+      "T1485 Data Destruction",
+      "T1561 Disk Wipe",
+      "T1078 Valid Accounts"
+    ],
+    "procedures": [
+      "Internal propagation via admin shares using stolen domain admin credentials."
+    ],
+    "indicators": [
+      "disttrack.exe",
+      "\\\\*\\C$\\Windows\\system32\\wiper.sys"
+    ],
+    "relatedIncidents": [
+      "Saudi Aramco 2012 Wipe (30,000 workstations)",
+      "Saipem Middle East 2018 Wipe"
+    ],
+    "references": [
+      {
+        "title": "NCA Saudi Incident Telemetry",
+        "url": "https://nca.gov.sa"
+      }
+    ],
+    "author": "MENA Cyber Wire Intelligence Desk",
+    "lastUpdated": "2026-11-22T11:53:03.542Z",
+    "publicationStatus": "Published",
+    "isFeatured": true
+  },
+  {
+    "id": "actor-triton",
+    "name": "TRITON / TRISIS",
+    "aliases": "XENOTIME (Dragos), HatMan",
+    "origin": "Russian State Research Institute (TsNIIKhM)",
+    "region": "Saudi Arabia / Middle East Industrial Plants",
+    "targetSectors": [
+      "Safety Instrumented Systems (SIS)",
+      "Petrochemical Refineries",
+      "Industrial Plants"
+    ],
+    "description": "First discovered in 2017 targeting a petrochemical plant in Saudi Arabia. Built specifically to reprogram Triconex safety controllers that prevent explosions or toxic leaks.",
+    "threatProfile": "Interacts directly with proprietary TriStation network protocols to read/write memory on safety instrumented system firmware.",
+    "tactics": [
+      "OT/ICS Infiltration",
+      "Safety System Tampering",
+      "Physical Disruption Threat"
+    ],
+    "techniques": [
+      "T0839 Modify Controller Tasking",
+      "T0887 Denial of Safety"
+    ],
+    "procedures": [
+      "Reprogramming Schneider Electric Triconex MP 3008 controllers."
+    ],
+    "indicators": [
+      "trilog.exe",
+      "imain.bin",
+      "inject.bin"
+    ],
+    "relatedIncidents": [
+      "2017 Petrochemical Plant Emergency Tripping"
+    ],
+    "references": [
+      {
+        "title": "US Treasury Sanctions Announcement (2020)",
+        "url": "https://home.treasury.gov"
+      }
+    ],
+    "author": "MENA Cyber Wire Intelligence Desk",
+    "lastUpdated": "2026-11-22T11:53:03.542Z",
+    "publicationStatus": "Published",
+    "isFeatured": true
+  }
+]

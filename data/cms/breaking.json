@@ -1,0 +1,27 @@
+[
+  {
+    "id": "brk-01",
+    "headline": "Urgent: Active Exploitation of Edge VPN Firewalls Reported Across GCC Government Networks",
+    "description": "State-affiliated threat groups are targeting unpatched boundary gateways to gain persistence before weekend SOC shift changes.",
+    "source": "aeCERT & Saudi NCA Warning",
+    "sourceUrl": "https://nca.gov.sa",
+    "country": "Regional MENA",
+    "category": "Critical Infrastructure",
+    "severity": "Critical",
+    "verificationStatus": "SIGNAL",
+    "publishedAt": "2026-11-22T11:51:38.488Z",
+    "isResolved": false
+  },
+  {
+    "id": "brk-02",
+    "headline": "New Ransomware Variant Implements Arabic Ransom Note Lures in UAE Logistics Sector",
+    "description": "Affiliates observed delivering double-extortion payloads via compromised corporate email credentials.",
+    "source": "MENA Cyber Desk",
+    "country": "United Arab Emirates",
+    "category": "Ransomware",
+    "severity": "High",
+    "verificationStatus": "WATCH",
+    "publishedAt": "2026-11-22T08:51:38.489Z",
+    "isResolved": false
+  }
+]

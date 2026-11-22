@@ -1,0 +1,68 @@
+{
+  "leadStoryId": "mcw-desk-01",
+  "featuredStoryIds": [
+    "mcw-desk-01",
+    "mcw-desk-02",
+    "mcw-desk-03"
+  ],
+  "topStoryIds": [
+    "mcw-desk-02",
+    "mcw-desk-03"
+  ],
+  "secondaryStoryIds": [
+    "mcw-desk-04",
+    "mcw-desk-05"
+  ],
+  "sections": [
+    {
+      "id": "sec-breaking",
+      "title": "Breaking Wire Ticker",
+      "type": "breaking_ticker",
+      "order": 1,
+      "isEnabled": true
+    },
+    {
+      "id": "sec-lead",
+      "title": "Lead Investigation",
+      "type": "lead",
+      "order": 2,
+      "isEnabled": true
+    },
+    {
+      "id": "sec-radar",
+      "title": "Regional Threat Radar",
+      "type": "radar",
+      "order": 3,
+      "isEnabled": true
+    },
+    {
+      "id": "sec-river",
+      "title": "Live Intelligence River",
+      "type": "river",
+      "order": 4,
+      "isEnabled": true
+    },
+    {
+      "id": "sec-vulns",
+      "title": "Critical Vulnerabilities",
+      "type": "vulnerabilities",
+      "order": 5,
+      "isEnabled": true
+    },
+    {
+      "id": "sec-research",
+      "title": "Adversary Research",
+      "type": "research",
+      "order": 6,
+      "isEnabled": true
+    },
+    {
+      "id": "sec-community",
+      "title": "Practitioner Community",
+      "type": "community",
+      "order": 7,
+      "isEnabled": true
+    }
+  ],
+  "lastUpdated": "2026-11-22T11:52:15.102Z"
+}

@@ -39,4 +39,5 @@ export interface CyberPulseSummary {
   keyTakeaway: string;
   advisoriesCount: number;
   criticalCveCount: number;
+  recommendedDefensiveActions?: string[];
 }

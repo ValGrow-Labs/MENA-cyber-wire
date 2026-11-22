@@ -1,0 +1,41 @@
+[
+  {
+    "cveId": "CVE-2024-3400",
+    "editorialTitle": "Palo Alto PAN-OS Command Injection Zero-Day",
+    "editorialSeverity": "CRITICAL",
+    "cvssScore": 10,
+    "affectedProducts": [
+      "PAN-OS 10.2",
+      "PAN-OS 11.0",
+      "PAN-OS 11.1"
+    ],
+    "vendor": "Palo Alto Networks",
+    "description": "Unauthenticated remote code execution via GlobalProtect feature.",
+    "menaImpactNotes": "Extensively deployed as boundary firewall in GCC government, banking, and energy perimeter networks. Immediate patching mandatory under NCA & aeCERT directives.",
+    "recommendedRemediation": "Upgrade to PAN-OS 10.2.9-h1, 11.0.4-h1, or 11.1.2-h3 immediately. Audit system logs for root shell executions.",
+    "patchStatus": "Available",
+    "isFeatured": true,
+    "isHidden": false,
+    "isCustomEntry": false,
+    "lastUpdated": "2026-11-22T11:53:03.544Z"
+  },
+  {
+    "cveId": "CVE-2024-21887",
+    "editorialTitle": "Ivanti Connect Secure and Policy Secure Command Injection",
+    "editorialSeverity": "CRITICAL",
+    "cvssScore": 9.1,
+    "affectedProducts": [
+      "Ivanti Connect Secure 9.x",
+      "Ivanti Connect Secure 22.x"
+    ],
+    "vendor": "Ivanti",
+    "description": "Command injection in web components allows authenticated admin command execution.",
+    "menaImpactNotes": "Observed in APT espionage campaigns targeting Middle Eastern telecommunications and defense ministries.",
+    "recommendedRemediation": "Apply Ivanti security patches and run external integrity checker tool (ICT).",
+    "patchStatus": "Available",
+    "isFeatured": true,
+    "isHidden": false,
+    "isCustomEntry": false,
+    "lastUpdated": "2026-11-22T11:53:03.544Z"
+  }
+]
