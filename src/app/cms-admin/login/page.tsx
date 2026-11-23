@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, Lock, Mail, ArrowRight } from "lucide-react";
+import { Lock, Mail, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useAdmin } from "../layout";
 
 export default function CMSLoginPage() {
   const router = useRouter();
   const { notify } = useAdmin();
-  const [email, setEmail] = useState("admin@menacyberwire.com");
-  const [password, setPassword] = useState("MenaCyber@2026!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,13 +88,22 @@ export default function CMSLoginPage() {
                 <Lock size={16} />
               </span>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full rounded-md border border-[#2B2B2B] bg-[#191919] py-2.5 pl-9 pr-3 text-xs text-[#F5F5F5] placeholder-[#707070] focus:border-[#D63838] focus:outline-none"
+                className="w-full rounded-md border border-[#2B2B2B] bg-[#191919] py-2.5 pl-9 pr-10 text-xs text-[#F5F5F5] placeholder-[#707070] focus:border-[#D63838] focus:outline-none"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#707070] transition-colors hover:text-[#F5F5F5]"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 
@@ -108,13 +118,6 @@ export default function CMSLoginPage() {
             </button>
           </div>
         </form>
-
-        <div className="mt-6 border-t border-[#2B2B2B] pt-4 text-center">
-          <p className="font-mono text-[11px] text-[#707070]">
-            Default Master: <span className="text-[#A1A1A1]">admin@menacyberwire.com</span> &middot;{" "}
-            <span className="text-[#A1A1A1]">MenaCyber@2026!</span>
-          </p>
-        </div>
       </div>
     </div>
   );
