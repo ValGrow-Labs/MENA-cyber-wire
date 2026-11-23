@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   optimizeFonts: false,
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

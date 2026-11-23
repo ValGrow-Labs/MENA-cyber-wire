@@ -3,6 +3,28 @@
     "adminId": "usr-admin-01",
     "adminEmail": "admin@menacyberwire.com",
     "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_FAILED",
+    "targetType": "AUTH",
+    "details": "Invalid password supplied.",
+    "ipAddress": "::1",
+    "id": "log-1795418862519-335",
+    "timestamp": "2026-11-23T07:27:42.519Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
+    "id": "log-1795418687521-687",
+    "timestamp": "2026-11-23T07:24:47.521Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
     "action": "AUTH_LOGIN_SUCCESS",
     "targetType": "AUTH",
     "details": "Successful login as SUPER_ADMIN",
