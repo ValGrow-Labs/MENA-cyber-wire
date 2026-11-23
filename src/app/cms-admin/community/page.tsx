@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { MessagesSquare, Plus, Pin, EyeOff, Trash2, Flag, CheckCircle2 } from "lucide-react";
 import { CMSCommunityPost } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 
 export default function CMSCommunityPage() {

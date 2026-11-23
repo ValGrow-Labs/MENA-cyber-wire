@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CalendarDays, Save, Printer, Plus, Trash2, Check, Shield } from "lucide-react";
 import { CMSDailyBrief } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSDailyBriefPage() {
   const { notify } = useAdmin();

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from "lucide-react";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSLoginPage() {
   const router = useRouter();

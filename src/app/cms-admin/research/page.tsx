@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Binary, Plus, Edit2, Trash2, Shield } from "lucide-react";
 import { CMSThreatActorResearch } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 
 export default function CMSResearchPage() {

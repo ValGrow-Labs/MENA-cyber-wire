@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import {
   AdminUser,
   CMSArticle,
@@ -20,47 +21,72 @@ import { hashPassword } from "./auth";
 import { MENA_COUNTRIES } from "@/lib/country/mena-countries";
 import { CURATED_MENA_INTELLIGENCE } from "@/lib/news/curated-seed";
 
-const DATA_DIR = path.join(process.cwd(), "data", "cms");
+// Dual paths: bundled static seed dir and writable serverless /tmp dir
+const BUNDLED_DIR = path.join(process.cwd(), "data", "cms");
+const TMP_DIR = path.join(os.tmpdir(), "mena-cyber-cms");
 
-// Ensure data directory exists
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+// In-memory cache ensures zero EROFS exceptions on Vercel / read-only serverless platforms
+const memoryCache: Record<string, any> = {};
+
+function ensureDir(dir: string) {
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch {}
 }
 
 function readJsonFile<T>(filename: string, defaultValue: T): T {
-  ensureDataDir();
-  const filePath = path.join(DATA_DIR, filename);
-  if (!fs.existsSync(filePath)) {
-    writeJsonAtomic(filename, defaultValue);
-    return defaultValue;
+  // 1. Check in-memory cache first
+  if (memoryCache[filename] !== undefined) {
+    return memoryCache[filename] as T;
   }
+
+  // 2. Check writable /tmp directory next (written in current serverless session)
   try {
-    const raw = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(raw) as T;
-  } catch (err) {
-    console.error(`Error reading ${filename}, returning default`, err);
-    return defaultValue;
-  }
+    const tmpFile = path.join(TMP_DIR, filename);
+    if (fs.existsSync(tmpFile)) {
+      const raw = fs.readFileSync(tmpFile, "utf-8");
+      const parsed = JSON.parse(raw);
+      memoryCache[filename] = parsed;
+      return parsed as T;
+    }
+  } catch {}
+
+  // 3. Check bundled project data directory next
+  try {
+    const bundledFile = path.join(BUNDLED_DIR, filename);
+    if (fs.existsSync(bundledFile)) {
+      const raw = fs.readFileSync(bundledFile, "utf-8");
+      const parsed = JSON.parse(raw);
+      memoryCache[filename] = parsed;
+      return parsed as T;
+    }
+  } catch {}
+
+  // 4. Fallback to default generated seed
+  memoryCache[filename] = defaultValue;
+  writeJsonAtomic(filename, defaultValue);
+  return defaultValue;
 }
 
 function writeJsonAtomic<T>(filename: string, data: T): void {
-  ensureDataDir();
-  const targetPath = path.join(DATA_DIR, filename);
-  const tempPath = path.join(DATA_DIR, `${filename}.${Date.now()}.tmp`);
+  // Always update in-memory cache immediately
+  memoryCache[filename] = data;
+
+  // Try writing to /tmp directory (works on Vercel and AWS Lambda)
   try {
-    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), "utf-8");
-    fs.renameSync(tempPath, targetPath);
-  } catch (err) {
-    if (fs.existsSync(tempPath)) {
-      try {
-        fs.unlinkSync(tempPath);
-      } catch {}
-    }
-    // Fallback direct write
-    fs.writeFileSync(targetPath, JSON.stringify(data, null, 2), "utf-8");
-  }
+    ensureDir(TMP_DIR);
+    const tmpTarget = path.join(TMP_DIR, filename);
+    fs.writeFileSync(tmpTarget, JSON.stringify(data, null, 2), "utf-8");
+  } catch {}
+
+  // Try writing to local project directory (works in local dev, silently skipped on Vercel read-only filesystem)
+  try {
+    ensureDir(BUNDLED_DIR);
+    const localTarget = path.join(BUNDLED_DIR, filename);
+    fs.writeFileSync(localTarget, JSON.stringify(data, null, 2), "utf-8");
+  } catch {}
 }
 
 // -----------------------------------------------------------------------------

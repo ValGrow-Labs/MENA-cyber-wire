@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { FolderTree, Plus, Edit2, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { CMSCategory } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 
 export default function CMSCategoriesPage() {

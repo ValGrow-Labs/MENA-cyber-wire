@@ -21,7 +21,7 @@ import {
 import { CMSArticle } from "@/types/cms";
 import RichTextEditor from "./RichTextEditor";
 import MediaPickerModal from "./MediaPickerModal";
-import { useAdmin } from "@/app/cms-admin/layout";
+import { useAdmin } from "@/app/cms-admin/AdminContext";
 
 interface ArticleEditorFormProps {
   initialArticle?: Partial<CMSArticle>;

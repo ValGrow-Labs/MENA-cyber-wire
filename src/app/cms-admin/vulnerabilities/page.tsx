@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ShieldAlert, Plus, Edit2, Trash2, Eye, EyeOff, ExternalLink } from "lucide-react";
 import { CMSVulnerabilityEditorial } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 
 export default function CMSVulnerabilitiesPage() {

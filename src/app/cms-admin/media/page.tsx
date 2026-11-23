@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Image as ImageIcon, Upload, Trash2, Copy, Check, Search } from "lucide-react";
 import { CMSMediaItem } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 
 export default function CMSMediaLibraryPage() {

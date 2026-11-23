@@ -60,15 +60,17 @@ export async function POST(request: Request) {
         resetTime: now + WINDOW_MS,
       });
 
-      CMS_DB.addAuditLog({
-        adminId: "anonymous",
-        adminEmail: email,
-        adminName: "Unknown Attempt",
-        action: "AUTH_LOGIN_FAILED",
-        targetType: "AUTH",
-        details: `Failed login attempt for email: ${email}`,
-        ipAddress: ip,
-      });
+      try {
+        CMS_DB.addAuditLog({
+          adminId: "anonymous",
+          adminEmail: email,
+          adminName: "Unknown Attempt",
+          action: "AUTH_LOGIN_FAILED",
+          targetType: "AUTH",
+          details: `Failed login attempt for email: ${email}`,
+          ipAddress: ip,
+        });
+      } catch {}
 
       return NextResponse.json(
         { success: false, error: "Invalid email or password." },
@@ -89,15 +91,17 @@ export async function POST(request: Request) {
         resetTime: now + WINDOW_MS,
       });
 
-      CMS_DB.addAuditLog({
-        adminId: user.id,
-        adminEmail: user.email,
-        adminName: user.name,
-        action: "AUTH_LOGIN_FAILED",
-        targetType: "AUTH",
-        details: "Invalid password supplied.",
-        ipAddress: ip,
-      });
+      try {
+        CMS_DB.addAuditLog({
+          adminId: user.id,
+          adminEmail: user.email,
+          adminName: user.name,
+          action: "AUTH_LOGIN_FAILED",
+          targetType: "AUTH",
+          details: "Invalid password supplied.",
+          ipAddress: ip,
+        });
+      } catch {}
 
       return NextResponse.json(
         { success: false, error: "Invalid email or password." },
@@ -108,21 +112,25 @@ export async function POST(request: Request) {
     // Reset rate limiter upon successful login
     loginAttempts.delete(ip);
 
-    // Update lastLoginAt
-    user.lastLoginAt = new Date().toISOString();
-    CMS_DB.upsertUser(user);
+    // Update lastLoginAt safely
+    try {
+      user.lastLoginAt = new Date().toISOString();
+      CMS_DB.upsertUser(user);
+    } catch {}
 
     const token = createSessionToken(user);
 
-    CMS_DB.addAuditLog({
-      adminId: user.id,
-      adminEmail: user.email,
-      adminName: user.name,
-      action: "AUTH_LOGIN_SUCCESS",
-      targetType: "AUTH",
-      details: `Successful login as ${user.role}`,
-      ipAddress: ip,
-    });
+    try {
+      CMS_DB.addAuditLog({
+        adminId: user.id,
+        adminEmail: user.email,
+        adminName: user.name,
+        action: "AUTH_LOGIN_SUCCESS",
+        targetType: "AUTH",
+        details: `Successful login as ${user.role}`,
+        ipAddress: ip,
+      });
+    } catch {}
 
     const response = NextResponse.json({
       success: true,

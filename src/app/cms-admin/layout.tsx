@@ -1,30 +1,11 @@
 "use client";
 
-import { useEffect, useState, createContext, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import AdminSidebar from "@/components/cms/AdminSidebar";
 import AdminHeader from "@/components/cms/AdminHeader";
 import ToastNotification, { ToastMessage } from "@/components/cms/ToastNotification";
-
-interface AdminContextType {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    avatarUrl?: string;
-  } | null;
-  notify: (text: string, type?: "success" | "error" | "info" | "warning") => void;
-  logout: () => void;
-}
-
-const AdminContext = createContext<AdminContextType>({
-  user: null,
-  notify: () => {},
-  logout: () => {},
-});
-
-export const useAdmin = () => useContext(AdminContext);
+import { AdminContext } from "./AdminContext";
 
 export default function CMSAdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();

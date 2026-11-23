@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { History, Search, Shield, Filter } from "lucide-react";
 import { CMSAuditLog } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSAuditLogsPage() {
   const { notify } = useAdmin();

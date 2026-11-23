@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { CMSArticle } from "@/types/cms";
 import ConfirmModal from "@/components/cms/ConfirmModal";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSArticlesPage() {
   const { notify } = useAdmin();

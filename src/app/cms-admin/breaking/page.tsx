@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Radio, Plus, Trash2, CheckCircle2, AlertTriangle, ExternalLink, ArrowRight } from "lucide-react";
 import { CMSBreakingNews } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 import Link from "next/link";
 

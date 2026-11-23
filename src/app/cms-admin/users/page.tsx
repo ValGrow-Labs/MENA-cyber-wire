@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Users, Plus, Shield, CheckCircle2, XCircle, Trash2, Key } from "lucide-react";
 import { AdminUser, AdminRole } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 import ConfirmModal from "@/components/cms/ConfirmModal";
 
 export default function CMSUsersPage() {

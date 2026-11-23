@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Globe2, Save, CheckCircle2, Shield, AlertTriangle } from "lucide-react";
 import { CMSCountryProfile } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSCountriesPage() {
   const { notify } = useAdmin();

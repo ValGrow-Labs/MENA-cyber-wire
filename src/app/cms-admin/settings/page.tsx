@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Settings, Save, Clock, Globe } from "lucide-react";
 import { CMSWebsiteSettings } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSSettingsPage() {
   const { notify } = useAdmin();

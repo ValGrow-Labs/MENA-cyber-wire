@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Search, Save, Globe } from "lucide-react";
 import { CMSSEOSettings } from "@/types/cms";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSSEOPage() {
   const { notify } = useAdmin();

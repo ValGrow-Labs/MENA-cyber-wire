@@ -3,6 +3,38 @@
     "adminId": "usr-admin-01",
     "adminEmail": "admin@menacyberwire.com",
     "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
+    "id": "log-1795420954415-744",
+    "timestamp": "2026-11-23T08:02:34.415Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGOUT",
+    "targetType": "AUTH",
+    "details": "Admin logged out.",
+    "id": "log-1795420913436-732",
+    "timestamp": "2026-11-23T08:01:53.436Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
+    "id": "log-1795420910296-22",
+    "timestamp": "2026-11-23T08:01:50.296Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
     "action": "AUTH_LOGOUT",
     "targetType": "AUTH",
     "details": "Admin logged out.",

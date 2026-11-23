@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Save, CheckCircle2, Star, MoveUp, MoveDown, Eye } from "lucide-react";
-import { useAdmin } from "../layout";
+import { useAdmin } from "../AdminContext";
 
 export default function CMSFeaturedStoriesPage() {
   const { notify } = useAdmin();
