@@ -338,7 +338,7 @@ export default function CMSBreakingNewsPage() {
                   <p className="font-mono text-[11px] text-[#707070]">Source: {b.source}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => handleToggleResolve(b)}
                     className="rounded border border-[#2B2B2B] bg-[#191919] px-3 py-1.5 text-xs text-[#A1A1A1] hover:bg-[#202020] hover:text-[#F5F5F5]"

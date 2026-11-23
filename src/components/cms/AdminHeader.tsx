@@ -56,26 +56,27 @@ export default function AdminHeader({ onToggleMobileMenu, user }: AdminHeaderPro
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#2B2B2B] bg-[#0B0B0B]/95 px-4 backdrop-blur sm:px-6">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#2B2B2B] bg-[#0B0B0B]/95 px-3 backdrop-blur sm:px-6">
+      <div className="flex items-center gap-2.5 min-w-0">
         <button
           onClick={onToggleMobileMenu}
-          className="rounded p-1.5 text-[#A1A1A1] hover:bg-[#191919] hover:text-[#F5F5F5] lg:hidden"
+          aria-label="Open sidebar menu"
+          className="rounded p-2 text-[#A1A1A1] hover:bg-[#191919] hover:text-[#F5F5F5] lg:hidden"
         >
           <Menu size={20} />
         </button>
-        <div>
-          <h1 className="font-serif text-base font-semibold text-[#F5F5F5] sm:text-lg">
+        <div className="min-w-0">
+          <h1 className="truncate font-serif text-base font-semibold text-[#F5F5F5] sm:text-lg">
             {getPageTitle(pathname)}
           </h1>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-3">
         {/* Riyadh Timezone Indicator */}
-        <div className="flex items-center gap-1.5 rounded border border-[#2B2B2B] bg-[#151515] px-3 py-1 text-xs text-[#A1A1A1]">
+        <div className="flex items-center gap-1.5 rounded border border-[#2B2B2B] bg-[#151515] px-2.5 py-1 text-xs text-[#A1A1A1]">
           <Clock size={13} className="text-[#D63838]" />
-          <span className="font-mono text-[11px]">{riyadhTime || "Riyadh AST"}</span>
+          <span className="font-mono text-[11px] whitespace-nowrap">{riyadhTime || "Riyadh AST"}</span>
         </div>
       </div>
     </header>

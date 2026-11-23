@@ -158,7 +158,7 @@ export default function CMSCountriesPage() {
         <div className="lg:col-span-8">
           {currentCountry && (
             <form onSubmit={handleSaveCountry} className="rounded-lg border border-[#2B2B2B] bg-[#151515] p-6 space-y-5">
-              <div className="flex items-center justify-between border-b border-[#2B2B2B] pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#2B2B2B] pb-4">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{currentCountry.flag}</span>
                   <div>

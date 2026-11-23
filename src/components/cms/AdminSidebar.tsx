@@ -23,6 +23,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  X,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -35,6 +36,8 @@ interface AdminSidebarProps {
     avatarUrl?: string;
   };
   onLogout: () => void;
+  isMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -67,19 +70,27 @@ export default function AdminSidebar({
   onToggleCollapse,
   user,
   onLogout,
+  isMobile = false,
+  onCloseMobile,
 }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
     <aside
       className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col border-r border-[#2B2B2B] bg-[#0B0B0B] text-[#F5F5F5] transition-all duration-300 ${
-        collapsed ? "w-16" : "w-64"
+        isMobile
+          ? "w-64 max-w-[85vw] flex"
+          : `${collapsed ? "w-16" : "w-64"} hidden lg:flex`
       }`}
     >
       {/* Brand Header */}
       <div className="flex h-16 items-center justify-between border-b border-[#2B2B2B] px-4">
-        {!collapsed && (
-          <Link href="/cms-admin/dashboard" className="flex items-center gap-2.5">
+        {(!collapsed || isMobile) && (
+          <Link
+            href="/cms-admin/dashboard"
+            onClick={() => isMobile && onCloseMobile?.()}
+            className="flex items-center gap-2.5"
+          >
             <span className="flex h-8 w-8 items-center justify-center rounded bg-[#D63838] font-mono font-bold text-white shadow-sm">
               M
             </span>
@@ -93,25 +104,35 @@ export default function AdminSidebar({
             </div>
           </Link>
         )}
-        {collapsed && (
+        {collapsed && !isMobile && (
           <span className="mx-auto flex h-8 w-8 items-center justify-center rounded bg-[#D63838] font-mono font-bold text-white">
             M
           </span>
         )}
-        <button
-          onClick={onToggleCollapse}
-          className="hidden rounded p-1 text-[#A1A1A1] hover:bg-[#191919] hover:text-[#F5F5F5] lg:block"
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+        {isMobile ? (
+          <button
+            onClick={onCloseMobile}
+            className="rounded p-1.5 text-[#A1A1A1] hover:bg-[#191919] hover:text-[#F5F5F5]"
+            aria-label="Close sidebar menu"
+          >
+            <X size={18} />
+          </button>
+        ) : (
+          <button
+            onClick={onToggleCollapse}
+            className="hidden rounded p-1 text-[#A1A1A1] hover:bg-[#191919] hover:text-[#F5F5F5] lg:block"
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
       <div className="flex-1 overflow-y-auto px-2 py-4 scrollbar-thin">
         {NAV_ITEMS.map((section) => (
           <div key={section.group} className="mb-5">
-            {!collapsed && (
+            {(!collapsed || isMobile) && (
               <p className="mb-1.5 px-3 font-mono text-[10px] font-semibold tracking-wider text-[#707070]">
                 {section.group}
               </p>
@@ -127,12 +148,13 @@ export default function AdminSidebar({
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={() => isMobile && onCloseMobile?.()}
                       className={`group flex items-center gap-3 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
                         isActive
                           ? "bg-[#191919] text-[#F5F5F5] font-semibold"
                           : "text-[#A1A1A1] hover:bg-[#151515] hover:text-[#F5F5F5]"
                       }`}
-                      title={collapsed ? item.label : undefined}
+                      title={collapsed && !isMobile ? item.label : undefined}
                     >
                       <span
                         className={`${
@@ -141,8 +163,8 @@ export default function AdminSidebar({
                       >
                         <Icon size={17} />
                       </span>
-                      {!collapsed && <span className="truncate">{item.label}</span>}
-                      {isActive && !collapsed && (
+                      {(!collapsed || isMobile) && <span className="truncate">{item.label}</span>}
+                      {isActive && (!collapsed || isMobile) && (
                         <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#D63838]" />
                       )}
                     </Link>
@@ -164,7 +186,7 @@ export default function AdminSidebar({
           title="Open Public Website"
         >
           <ExternalLink size={16} className="text-[#707070]" />
-          {!collapsed && <span>Open Public Site</span>}
+          {(!collapsed || isMobile) && <span>Open Public Site</span>}
         </a>
       </div>
 
@@ -175,7 +197,7 @@ export default function AdminSidebar({
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#202020] text-xs font-bold text-[#F5F5F5] border border-[#2B2B2B]">
               {user?.name ? user.name.slice(0, 2).toUpperCase() : "AD"}
             </div>
-            {!collapsed && (
+            {(!collapsed || isMobile) && (
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-[#F5F5F5]">
                   {user?.name || "Admin"}
@@ -186,7 +208,7 @@ export default function AdminSidebar({
               </div>
             )}
           </div>
-          {!collapsed && (
+          {(!collapsed || isMobile) && (
             <button
               onClick={onLogout}
               className="rounded p-1.5 text-[#707070] hover:bg-[#202020] hover:text-[#D63838]"

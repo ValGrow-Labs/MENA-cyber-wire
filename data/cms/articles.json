@@ -1,5 +1,51 @@
 [
   {
+    "id": "art-1795413282319",
+    "headline": "Test Advisory: Zero-Day Campaign Detected in Gulf Energy Sector",
+    "slug": "test-advisory-zero-day-campaign-detected-in-gulf-energy-sector",
+    "shortDescription": "Incident pathina short description enter pannunga.\n",
+    "body": "Rich text editor use panni headings, bold text, bullet points, code snippets ellam use panni formatted content write pannunga.",
+    "featuredImage": "",
+    "imageCaption": "",
+    "imageCredit": "",
+    "category": "Ransomware",
+    "country": "United Arab Emirates",
+    "relatedCountries": [],
+    "region": "Gulf",
+    "tags": [
+      "MENA",
+      "Cybersecurity"
+    ],
+    "sourceName": "MENA Cyber Wire Intelligence Desk",
+    "sourceUrl": "",
+    "author": "Senior Cyber Desk Editor",
+    "publishedAt": "2026-11-23T05:54:42.319Z",
+    "updatedAt": "2026-11-23T05:54:42.319Z",
+    "verificationStatus": "SIGNAL",
+    "severity": "High",
+    "editorialStatus": "Published",
+    "threatToAction": {
+      "whatHappened": "Incident pathina short description enter pannunga.\n",
+      "whoIsAffected": "United Arab Emirates enterprise networks",
+      "whyItMatters": "Operational risk to affected systems.",
+      "whatShouldUsersDo": "Apply vendor patches and audit access credentials immediately.",
+      "recommendedDefensiveActions": [
+        "Check internet-facing edge appliances against latest KEV bulletins.",
+        "Enforce phishing-resistant multi-factor authentication (MFA) across all remote access ports."
+      ]
+    },
+    "isBreaking": false,
+    "isFeatured": false,
+    "featuredPosition": "none",
+    "featuredPriority": 5,
+    "upvotes": 0,
+    "commentCount": 0,
+    "readTime": "4 min",
+    "seoTitle": "Test Advisory: Zero-Day Campaign Detected in Gulf Energy Sector",
+    "seoDescription": "Incident pathina short description enter pannunga.\n",
+    "noIndex": false
+  },
+  {
     "id": "mcw-desk-pan-os-3400",
     "headline": "Palo Alto firewall zero-day scored 10.0 and was exploited before a fix existed",
     "slug": "palo-alto-firewall-zero-day-scored-10-0-and-was-exploited-before-a-fix-existed",

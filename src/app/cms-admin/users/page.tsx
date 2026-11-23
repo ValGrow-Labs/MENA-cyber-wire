@@ -116,7 +116,7 @@ export default function CMSUsersPage() {
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-[#2B2B2B] bg-[#151515]">
-        <table className="w-full text-left text-xs">
+        <table className="w-full text-left text-xs min-w-[700px]">
           <thead className="border-b border-[#2B2B2B] bg-[#191919] font-mono text-[11px] uppercase tracking-wider text-[#707070]">
             <tr>
               <th className="py-3 px-4">User</th>

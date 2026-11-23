@@ -206,7 +206,7 @@ export default function CMSResearchPage() {
               {editingActor ? `Edit Profile: ${editingActor.name}` : "New Threat Actor Profile"}
             </h3>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block font-mono text-[10px] uppercase text-[#A1A1A1]">Group Name</label>
                 <input
@@ -286,7 +286,7 @@ export default function CMSResearchPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block font-mono text-[10px] uppercase text-[#A1A1A1]">Tactics (TTPs)</label>
                 <input

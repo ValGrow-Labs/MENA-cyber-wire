@@ -1,0 +1,39 @@
+[
+  {
+    "id": "brief-2026-11-23",
+    "date": "2026-11-23",
+    "threatLevel": "GUARDED",
+    "headline": "Morning Cyber Intelligence: Regional Posture, Edge Exposure, and Remediation Directives",
+    "executiveSummary": "Regional threat telemetry highlights continuing reconnaissance against internet-facing VPN gateways and firewall appliances across GCC petrochemical and financial verticals.",
+    "targetedSectors": [
+      "Energy and petrochemicals",
+      "Government & Vision 2030 entities",
+      "Banking and payments",
+      "Telecoms",
+      "Aviation"
+    ],
+    "primaryThreatActors": [
+      "MuddyWater",
+      "OilRig (APT34)",
+      "Shamoon wiper operators",
+      "LockBit affiliates"
+    ],
+    "keyTakeaway": "Edge devices, VPNs, firewalls, and remote-access gateways remain the primary entry point cited in regional alerts. Review KEV catalogs and enforce hardware MFA across all administrative ingress points.",
+    "recommendedDefensiveActions": [
+      "Check perimeter gateways (PAN-OS, Ivanti, Fortinet) against the current KEV list and patch anything listed.",
+      "Warn finance teams about phishing that imitates GCC regulator memos; MuddyWater has used this lure repeatedly.",
+      "Confirm offline backups exist and restore cleanly for OT historian and SCADA servers.",
+      "Require hardware-key or app-based MFA on every administrative portal, including vendor access."
+    ],
+    "topStoryIds": [
+      "mcw-desk-01",
+      "mcw-desk-02"
+    ],
+    "criticalCveIds": [
+      "CVE-2024-3400",
+      "CVE-2024-21887"
+    ],
+    "status": "Published",
+    "publishedAt": "2026-11-23T05:41:26.202Z"
+  }
+]

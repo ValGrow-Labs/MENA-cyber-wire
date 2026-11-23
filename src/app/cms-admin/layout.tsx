@@ -70,6 +70,7 @@ export default function CMSAdminLayout({ children }: { children: React.ReactNode
   };
 
   useEffect(() => {
+    setMobileOpen(false);
     checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
@@ -108,7 +109,7 @@ export default function CMSAdminLayout({ children }: { children: React.ReactNode
   return (
     <AdminContext.Provider value={{ user, notify, logout: handleLogout }}>
       <div className="flex min-h-screen bg-[#0B0B0B] text-[#F5F5F5] antialiased">
-        {/* Desktop Sidebar */}
+        {/* Desktop Sidebar (visible on lg+) */}
         <AdminSidebar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(!collapsed)}
@@ -116,20 +117,27 @@ export default function CMSAdminLayout({ children }: { children: React.ReactNode
           onLogout={handleLogout}
         />
 
-        {/* Mobile Sidebar Overlay */}
+        {/* Mobile Sidebar Overlay (visible on < lg when mobileOpen) */}
         {mobileOpen && (
           <div
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-50 flex bg-black/80 backdrop-blur-sm lg:hidden animate-rise"
             onClick={() => setMobileOpen(false)}
           >
-            <div className="w-64 h-full" onClick={(e) => e.stopPropagation()}>
+            <div className="h-full" onClick={(e) => e.stopPropagation()}>
               <AdminSidebar
                 collapsed={false}
                 onToggleCollapse={() => setMobileOpen(false)}
                 user={user}
                 onLogout={handleLogout}
+                isMobile
+                onCloseMobile={() => setMobileOpen(false)}
               />
             </div>
+            <button
+              className="flex-1 bg-transparent"
+              aria-label="Close menu backdrop"
+              onClick={() => setMobileOpen(false)}
+            />
           </div>
         )}
 

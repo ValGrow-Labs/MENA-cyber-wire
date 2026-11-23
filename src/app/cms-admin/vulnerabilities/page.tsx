@@ -247,7 +247,7 @@ export default function CMSVulnerabilitiesPage() {
               {editingItem ? `Edit CVE Overlay: ${editingItem.cveId}` : "Annotate Vulnerability / Directive"}
             </h3>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block font-mono text-[10px] uppercase text-[#A1A1A1]">CVE Identifier</label>
                 <input

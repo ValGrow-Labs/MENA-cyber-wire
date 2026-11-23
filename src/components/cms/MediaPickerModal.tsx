@@ -82,9 +82,9 @@ export default function MediaPickerModal({ isOpen, onClose, onSelectImage }: Med
         </div>
 
         {/* Body */}
-        <div className="grid flex-1 grid-cols-12 overflow-hidden">
+        <div className="flex flex-1 flex-col md:grid md:grid-cols-12 overflow-hidden">
           {/* Gallery */}
-          <div className="col-span-8 overflow-y-auto border-r border-[#2B2B2B] p-4">
+          <div className="flex-1 overflow-y-auto border-b md:border-b-0 md:border-r border-[#2B2B2B] p-4 md:col-span-8">
             <div className="mb-4 flex items-center justify-between">
               <span className="font-mono text-xs text-[#707070]">{items.length} media items</span>
               <label className="flex cursor-pointer items-center gap-2 rounded bg-[#D63838] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#b02c2c]">
@@ -108,7 +108,7 @@ export default function MediaPickerModal({ isOpen, onClose, onSelectImage }: Med
                 <p className="text-xs">No media uploaded yet.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {items.map((m) => {
                   const isSel = m.id === selectedId;
                   return (
@@ -141,7 +141,7 @@ export default function MediaPickerModal({ isOpen, onClose, onSelectImage }: Med
           </div>
 
           {/* Details Sidebar */}
-          <div className="col-span-4 flex flex-col justify-between overflow-y-auto bg-[#191919] p-4">
+          <div className="flex flex-col justify-between overflow-y-auto bg-[#191919] p-4 md:col-span-4 shrink-0 max-h-[40vh] md:max-h-none">
             {selectedItem ? (
               <div className="space-y-4">
                 <div className="aspect-video w-full overflow-hidden rounded border border-[#2B2B2B] bg-[#0B0B0B]">

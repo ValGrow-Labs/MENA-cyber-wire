@@ -7,6 +7,71 @@
     "targetType": "AUTH",
     "details": "Successful login as SUPER_ADMIN",
     "ipAddress": "::1",
+    "id": "log-1795414244047-8",
+    "timestamp": "2026-11-23T06:10:44.047Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_FAILED",
+    "targetType": "AUTH",
+    "details": "Invalid password supplied.",
+    "ipAddress": "::1",
+    "id": "log-1795414238824-849",
+    "timestamp": "2026-11-23T06:10:38.824Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGOUT",
+    "targetType": "AUTH",
+    "details": "Admin logged out.",
+    "id": "log-1795414233503-918",
+    "timestamp": "2026-11-23T06:10:33.503Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "ARTICLE_CREATE",
+    "targetType": "ARTICLE",
+    "targetId": "art-1795413282319",
+    "targetTitle": "Test Advisory: Zero-Day Campaign Detected in Gulf Energy Sector",
+    "details": "Created article in status: Published",
+    "id": "log-1795413282336-290",
+    "timestamp": "2026-11-23T05:54:42.336Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
+    "id": "log-1795412939366-762",
+    "timestamp": "2026-11-23T05:48:59.366Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGOUT",
+    "targetType": "AUTH",
+    "details": "Admin logged out.",
+    "id": "log-1795412932870-340",
+    "timestamp": "2026-11-23T05:48:52.870Z"
+  },
+  {
+    "adminId": "usr-admin-01",
+    "adminEmail": "admin@menacyberwire.com",
+    "adminName": "Senior Cyber Desk Editor",
+    "action": "AUTH_LOGIN_SUCCESS",
+    "targetType": "AUTH",
+    "details": "Successful login as SUPER_ADMIN",
+    "ipAddress": "::1",
     "id": "log-1795348539987-228",
     "timestamp": "2026-11-22T11:55:39.987Z"
   },

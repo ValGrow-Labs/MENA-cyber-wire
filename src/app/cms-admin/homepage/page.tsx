@@ -99,21 +99,21 @@ export default function CMSHomepageBuilderPage() {
           {sections.map((sec, index) => (
             <div
               key={sec.id}
-              className={`flex items-center justify-between rounded-lg border p-3.5 transition-colors ${
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border p-3.5 transition-colors ${
                 sec.isEnabled ? "border-[#2B2B2B] bg-[#191919]" : "border-[#2B2B2B]/40 bg-[#151515] opacity-50"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-[#202020] font-mono text-xs font-bold text-[#A1A1A1]">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#202020] font-mono text-xs font-bold text-[#A1A1A1]">
                   {sec.order || index + 1}
                 </span>
-                <div>
-                  <h4 className="font-serif text-sm font-semibold text-[#F5F5F5]">{sec.title}</h4>
+                <div className="min-w-0">
+                  <h4 className="font-serif text-sm font-semibold text-[#F5F5F5] truncate">{sec.title}</h4>
                   <p className="font-mono text-[10px] text-[#707070]">Section key: {sec.type}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => toggleSectionEnabled(sec.id)}

@@ -109,7 +109,7 @@ export default function CMSDailyBriefPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <a
             href="/daily-brief"
             target="_blank"

@@ -1,0 +1,18 @@
+{
+  "websiteName": "MENA Cyber Wire",
+  "websiteTagline": "Regional Cyber Intelligence. Real-time Awareness.",
+  "logoUrl": "",
+  "faviconUrl": "",
+  "contactEmail": "intel@menacyberwire.com",
+  "socialLinks": {
+    "twitter": "https://x.com/menacyberwire",
+    "linkedin": "https://linkedin.com/company/mena-cyber-wire",
+    "telegram": "https://t.me/menacyberwire",
+    "github": "https://github.com/ValGrow-Labs/MENA-cyber-wire"
+  },
+  "footerDisclaimer": "MENA Cyber Wire is an independent intelligence and editorial platform dedicated to regional security transparency across the Middle East & North Africa.",
+  "editorialTimezone": "Asia/Riyadh",
+  "breakingNewsTickerEnabled": true,
+  "threatLevelOverride": "GUARDED",
+  "lastUpdated": "2026-11-23T05:41:26.206Z"
+}
