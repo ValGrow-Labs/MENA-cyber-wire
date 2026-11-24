@@ -184,6 +184,7 @@ async function runAudit() {
     test("Homepage OpenGraph title present", !!meta.metaTags["og:title"], "og:title missing");
     test("Homepage OpenGraph image present", !!meta.metaTags["og:image"], "og:image missing");
     test("Homepage Twitter Card configured", meta.metaTags["twitter:card"] === "summary_large_image", `Card: "${meta.metaTags["twitter:card"]}"`);
+    test("Homepage renders exact Google verification meta tag", meta.metaTags["google-site-verification"] === "VHnRCIYeZoGz6XZhj_0WQ9iy9L3VkjFT-fHaaXbCvHA", `Found tag content: "${meta.metaTags["google-site-verification"]}"`);
 
     // Schema checks
     const orgSchema = meta.jsonLd.find((s) => s["@type"] === "NewsMediaOrganization" || s["@type"] === "Organization");

@@ -419,6 +419,7 @@ function getInitialSEO(): CMSSEOSettings {
     defaultOgImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
     canonicalBaseUrl: "https://menacyberwire.com",
     twitterHandle: "@menacyberwire",
+    googleSiteVerification: "VHnRCIYeZoGz6XZhj_0WQ9iy9L3VkjFT-fHaaXbCvHA",
     robotsTxtContent: "User-agent: *\nAllow: /\nDisallow: /cms-admin/\nDisallow: /api/\nDisallow: /saved\nDisallow: /search\nSitemap: https://menacyberwire.com/sitemap.xml\nSitemap: https://menacyberwire.com/news-sitemap.xml",
     publisherName: "MENA Cyber Wire",
     publisherLogoUrl: "https://menacyberwire.com/logo.png",

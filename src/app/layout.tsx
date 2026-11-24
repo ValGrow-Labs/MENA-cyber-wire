@@ -83,7 +83,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     verification: {
-      ...(seo.googleSiteVerification ? { google: seo.googleSiteVerification } : {}),
+      google: seo.googleSiteVerification || process.env.GOOGLE_SITE_VERIFICATION || "VHnRCIYeZoGz6XZhj_0WQ9iy9L3VkjFT-fHaaXbCvHA",
       ...(seo.bingSiteVerification ? { other: { "msvalidate.01": seo.bingSiteVerification } } : {}),
     },
     icons: {
