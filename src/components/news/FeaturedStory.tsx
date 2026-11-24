@@ -57,7 +57,8 @@ export default function FeaturedStory({ article }: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={article.imageUrl}
-                alt=""
+                alt={`${article.title} - ${article.country || "MENA"} cyber threat report`}
+                loading="eager"
                 className="aspect-[4/3] w-full object-cover grayscale-[35%] transition duration-700 group-hover:scale-[1.02] group-hover:grayscale-0"
               />
             </figure>
