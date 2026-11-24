@@ -34,6 +34,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     CMS_DB.upsertArticle(updated);
 
+    try {
+      const { revalidatePath } = await import("next/cache");
+      revalidatePath("/");
+      revalidatePath(`/article/${updated.slug || updated.id}`);
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/news-sitemap.xml");
+    } catch {}
+
     CMS_DB.addAuditLog({
       adminId: session.userId,
       adminEmail: session.email,

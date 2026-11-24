@@ -399,11 +399,73 @@ function getInitialSEO(): CMSSEOSettings {
     defaultTitle: "MENA Cyber Wire: Cyber Security Intelligence for the Middle East & North Africa",
     titleTemplate: "%s · MENA Cyber Wire",
     defaultDescription: "Independent reporting on cyber attacks, zero-days, ransomware, and national security directives across Saudi Arabia, UAE, Qatar, Egypt, and the MENA region.",
-    keywords: ["MENA cybersecurity", "Saudi Arabia cyber attack", "UAE cybersecurity", "NCA ECC", "aeCERT", "Q-CERT", "Middle East ransomware", "CISA advisories", "NVD CVE"],
+    keywords: [
+      "Middle East cybersecurity",
+      "MENA cyber threat intelligence",
+      "Saudi Arabia cybersecurity news",
+      "UAE cybersecurity news",
+      "Qatar cybersecurity",
+      "Middle East ransomware",
+      "MENA data breach",
+      "NCA ECC compliance",
+      "aeCERT advisories",
+      "Q-CERT warnings",
+      "Critical infrastructure security",
+      "CISA KEV catalog",
+      "NVD CVE vulnerability",
+      "APT threat actors",
+      "Gulf cyber defense"
+    ],
     defaultOgImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
     canonicalBaseUrl: "https://menacyberwire.com",
     twitterHandle: "@menacyberwire",
-    robotsTxtContent: "User-agent: *\nAllow: /\nDisallow: /cms-admin/\nDisallow: /api/cms/\nSitemap: https://menacyberwire.com/sitemap.xml",
+    robotsTxtContent: "User-agent: *\nAllow: /\nDisallow: /cms-admin/\nDisallow: /api/\nDisallow: /saved\nDisallow: /search\nSitemap: https://menacyberwire.com/sitemap.xml\nSitemap: https://menacyberwire.com/news-sitemap.xml",
+    publisherName: "MENA Cyber Wire",
+    publisherLogoUrl: "https://menacyberwire.com/logo.png",
+    contactEmail: "editor@menacyberwire.com",
+    socialProfiles: {
+      twitter: "https://twitter.com/menacyberwire",
+      linkedin: "https://linkedin.com/company/mena-cyber-wire",
+      telegram: "https://t.me/menacyberwire",
+    },
+    pageMetadata: {
+      home: {
+        title: "MENA Cyber Wire: Real-time Cyber Security Intelligence for Middle East & North Africa",
+        description: "Live cybersecurity telemetry, primary source reporting on regional ransomware campaigns, state-sponsored APT attacks, critical infrastructure threats, and regulatory directives across Saudi Arabia, UAE, Qatar, and North Africa.",
+        keywords: ["Middle East Cybersecurity", "UAE Cyber News", "Saudi Arabia Cyber Attack", "MENA Ransomware", "Critical Infrastructure"]
+      },
+      breaking: {
+        title: "Breaking Cybersecurity News & Active Incident Wire | MENA Cyber Wire",
+        description: "Real-time updates on active cyber attacks, zero-day alerts, and emergency advisories impacting GCC and MENA organizations.",
+        keywords: ["Breaking Cyber News", "Active Ransomware Middle East", "Emergency Cyber Advisory"]
+      },
+      threats: {
+        title: "Vulnerability Intelligence & CISA KEV Exploits in MENA | MENA Cyber Wire",
+        description: "Continuous vulnerability tracking, NVD CVSS telemetry, actively exploited vulnerabilities in perimeter equipment (PAN-OS, Ivanti, FortiOS), and remediation guidance.",
+        keywords: ["Vulnerability Intelligence", "CISA KEV", "NVD CVE", "Edge Appliance Exploit", "Patch Guidance"]
+      },
+      dailyBrief: {
+        title: "Daily Cyber Intelligence Brief & Defensive Telemetry | MENA Cyber Wire",
+        description: "Executive threat summary, daily regional risk level, sector-targeted advisories, and immediate defensive actions for CISOs and security analysts.",
+        keywords: ["Daily Cyber Brief", "MENA Threat Level", "Executive Security Summary", "SOC Recommendations"]
+      },
+      research: {
+        title: "APT Threat Actor Profiles & Deep Cyber Espionage Research | MENA Cyber Wire",
+        description: "Detailed threat dossiers on state-sponsored APT groups (MuddyWater, Charming Kitten, OilRig, Sandworm) active in the Middle East, with TTPs, MITRE ATT&CK mappings, and IOCs.",
+        keywords: ["APT Threat Actors", "Cyber Espionage Middle East", "MITRE ATT&CK MENA", "Indicators of Compromise"]
+      },
+      mena: {
+        title: "Regional Cybersecurity Desks & Sovereign Regulatory Watch | MENA Cyber Wire",
+        description: "Country-by-country intelligence across 13 Middle East & North African nations, tracking sovereign CERTs, PDPL laws, and threat postures.",
+        keywords: ["Country Desks", "Saudi NCA ECC", "UAE aeCERT", "Qatar Cyber Law", "Regional Cyber Defense"]
+      },
+      community: {
+        title: "Security Community & Practitioner Threat Exchange | MENA Cyber Wire",
+        description: "Vetted peer forum for MENA cybersecurity engineers, incident responders, and compliance officers sharing verified insights and threat mitigation.",
+        keywords: ["Cybersecurity Community", "MENA InfoSec", "Threat Exchange", "Incident Responders"]
+      }
+    },
+    redirectRules: [],
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -445,6 +507,29 @@ export const CMS_DB = {
   },
   getArticleById(id: string): CMSArticle | undefined {
     return this.getArticles().find((a) => a.id === id);
+  },
+  getArticleBySlug(slug: string): CMSArticle | undefined {
+    return this.getArticles().find((a) => a.slug === slug);
+  },
+  getArticleBySlugOrId(identifier: string): CMSArticle | undefined {
+    const list = this.getArticles();
+    return list.find((a) => a.slug === identifier || a.id === identifier);
+  },
+  getArticlesForSitemap(): CMSArticle[] {
+    return this.getArticles().filter(
+      (a) => a.editorialStatus === "Published" && !a.noIndex
+    );
+  },
+  getArticlesForNewsSitemap(): CMSArticle[] {
+    const fortyEightHoursAgo = Date.now() - 48 * 60 * 60 * 1000;
+    const published = this.getArticles().filter(
+      (a) => a.editorialStatus === "Published" && !a.noIndex
+    );
+    const recent = published.filter(
+      (a) => new Date(a.publishedAt).getTime() >= fortyEightHoursAgo
+    );
+    // If fewer than 5 in last 48h, fallback to the 10 most recent published news stories
+    return recent.length >= 5 ? recent : published.slice(0, 15);
   },
   saveArticles(articles: CMSArticle[]): void {
     writeJsonAtomic("articles.json", articles);
@@ -508,6 +593,16 @@ export const CMS_DB = {
   },
   getCountryByCode(code: string): CMSCountryProfile | undefined {
     return this.getCountries().find((c) => c.code.toUpperCase() === code.toUpperCase());
+  },
+  getCountryBySlugOrCode(val: string): CMSCountryProfile | undefined {
+    const clean = val.toLowerCase().trim();
+    return this.getCountries().find(
+      (c) =>
+        c.code.toLowerCase() === clean ||
+        c.slug.toLowerCase() === clean ||
+        c.name.toLowerCase() === clean ||
+        c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === clean
+    );
   },
   saveCountries(countries: CMSCountryProfile[]): void {
     writeJsonAtomic("countries.json", countries);

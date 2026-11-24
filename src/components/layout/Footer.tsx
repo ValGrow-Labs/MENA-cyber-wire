@@ -16,6 +16,8 @@ const SECTIONS = [
   { label: "Daily brief", href: "/daily-brief" },
   { label: "Research", href: "/research" },
   { label: "Community", href: "/community" },
+  { label: "About Us", href: "/about" },
+  { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Saved", href: "/saved" },
 ];
 

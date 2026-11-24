@@ -108,6 +108,11 @@ export default function ArticleEditorForm({ initialArticle, isNew = false }: Art
   const [seoTitle, setSeoTitle] = useState(initialArticle?.seoTitle || "");
   const [seoDescription, setSeoDescription] = useState(initialArticle?.seoDescription || "");
   const [canonicalUrl, setCanonicalUrl] = useState(initialArticle?.canonicalUrl || "");
+  const [focusKeyword, setFocusKeyword] = useState(initialArticle?.focusKeyword || "");
+  const [secondaryKeywords, setSecondaryKeywords] = useState(
+    (initialArticle?.secondaryKeywords || []).join(", ")
+  );
+  const [noIndex, setNoIndex] = useState(Boolean(initialArticle?.noIndex));
 
   const [saving, setSaving] = useState(false);
 
@@ -171,6 +176,12 @@ export default function ArticleEditorForm({ initialArticle, isNew = false }: Art
       seoTitle: seoTitle || headline,
       seoDescription: seoDescription || shortDescription,
       canonicalUrl: canonicalUrl || undefined,
+      focusKeyword: focusKeyword.trim() || undefined,
+      secondaryKeywords: secondaryKeywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter(Boolean),
+      noIndex,
     };
 
     try {
@@ -737,6 +748,106 @@ export default function ArticleEditorForm({ initialArticle, isNew = false }: Art
                 placeholder="https://..."
                 className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 font-mono text-xs text-[#F5F5F5] focus:outline-none"
               />
+            </div>
+          </div>
+
+          {/* Article SEO & Google Indexing */}
+          <div className="rounded-lg border border-[#2B2B2B] bg-[#151515] p-5 space-y-4">
+            <h3 className="font-serif text-sm font-semibold text-[#F5F5F5] border-b border-[#2B2B2B] pb-2 flex items-center justify-between">
+              <span>Search Engine Optimization (SEO)</span>
+              <span className="text-3xs font-mono text-[#D63838]">Google SERP</span>
+            </h3>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="block font-mono text-[10px] font-semibold uppercase text-[#A1A1A1]">
+                  Primary Focus Keyword
+                </label>
+                <span className="text-3xs text-[#707070]">Core ranking target</span>
+              </div>
+              <input
+                type="text"
+                value={focusKeyword}
+                onChange={(e) => setFocusKeyword(e.target.value)}
+                placeholder="e.g. Saudi Arabia ransomware attack"
+                className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 text-xs text-[#F5F5F5] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block font-mono text-[10px] font-semibold uppercase text-[#A1A1A1]">
+                Secondary Keywords (comma separated)
+              </label>
+              <input
+                type="text"
+                value={secondaryKeywords}
+                onChange={(e) => setSecondaryKeywords(e.target.value)}
+                placeholder="e.g. LockBit 3.0, NCA ECC compliance, ICS grid"
+                className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 text-xs text-[#F5F5F5] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="block font-mono text-[10px] font-semibold uppercase text-[#A1A1A1]">
+                  Custom SEO Title
+                </label>
+                <span className={`text-3xs font-mono ${(seoTitle || headline).length > 65 ? "text-amber-400" : "text-[#707070]"}`}>
+                  {(seoTitle || headline).length}/65 chars
+                </span>
+              </div>
+              <input
+                type="text"
+                value={seoTitle}
+                onChange={(e) => setSeoTitle(e.target.value)}
+                placeholder={headline || "Custom search title..."}
+                className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 text-xs text-[#F5F5F5] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="block font-mono text-[10px] font-semibold uppercase text-[#A1A1A1]">
+                  Meta Description
+                </label>
+                <span className={`text-3xs font-mono ${(seoDescription || shortDescription).length > 165 ? "text-amber-400" : "text-[#707070]"}`}>
+                  {(seoDescription || shortDescription).length}/160 chars
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
+                placeholder={shortDescription || "Search snippet description..."}
+                className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 text-xs text-[#F5F5F5] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block font-mono text-[10px] font-semibold uppercase text-[#A1A1A1]">
+                Canonical URL Override (Optional)
+              </label>
+              <input
+                type="url"
+                value={canonicalUrl}
+                onChange={(e) => setCanonicalUrl(e.target.value)}
+                placeholder="https://menacyberwire.com/article/..."
+                className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 font-mono text-xs text-[#F5F5F5] focus:outline-none"
+              />
+            </div>
+
+            <div className="pt-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={noIndex}
+                  onChange={(e) => setNoIndex(e.target.checked)}
+                  className="rounded border-[#2B2B2B] bg-[#191919] text-[#D63838] focus:ring-0"
+                />
+                <span className="text-xs text-[#A1A1A1]">
+                  Block search engines from indexing this article (<code className="text-3xs text-red-400">noindex</code>)
+                </span>
+              </label>
             </div>
           </div>
         </div>

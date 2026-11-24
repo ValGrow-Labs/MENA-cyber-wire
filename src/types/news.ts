@@ -40,6 +40,9 @@ export interface NewsArticle {
   commentCount: number;
   readTime?: string;
   isDemo?: boolean;
+  slug?: string;
+  author?: string;
+  updatedAt?: string;
 }
 
 export interface NewsFilterState {

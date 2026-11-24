@@ -55,6 +55,8 @@ export interface CMSArticle {
   isDemo?: boolean;
   seoTitle?: string;
   seoDescription?: string;
+  focusKeyword?: string;
+  secondaryKeywords?: string[];
   canonicalUrl?: string;
   noIndex?: boolean;
 }
@@ -238,6 +240,15 @@ export interface CMSWebsiteSettings {
   lastUpdated: string;
 }
 
+export interface RedirectRule {
+  id: string;
+  from: string;
+  to: string;
+  type: 301 | 302;
+  isEnabled: boolean;
+  createdAt: string;
+}
+
 export interface CMSSEOSettings {
   defaultTitle: string;
   titleTemplate: string;
@@ -247,6 +258,28 @@ export interface CMSSEOSettings {
   canonicalBaseUrl: string;
   twitterHandle?: string;
   robotsTxtContent?: string;
+  googleSiteVerification?: string;
+  bingSiteVerification?: string;
+  gaMeasurementId?: string;
+  publisherName?: string;
+  publisherLogoUrl?: string;
+  contactEmail?: string;
+  socialProfiles?: {
+    twitter?: string;
+    linkedin?: string;
+    telegram?: string;
+    github?: string;
+  };
+  pageMetadata?: {
+    home?: { title?: string; description?: string; keywords?: string[] };
+    breaking?: { title?: string; description?: string; keywords?: string[] };
+    threats?: { title?: string; description?: string; keywords?: string[] };
+    dailyBrief?: { title?: string; description?: string; keywords?: string[] };
+    research?: { title?: string; description?: string; keywords?: string[] };
+    mena?: { title?: string; description?: string; keywords?: string[] };
+    community?: { title?: string; description?: string; keywords?: string[] };
+  };
+  redirectRules?: RedirectRule[];
   lastUpdated: string;
 }
 

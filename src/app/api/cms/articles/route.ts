@@ -113,10 +113,20 @@ export async function POST(request: Request) {
       seoTitle: body.seoTitle,
       seoDescription: body.seoDescription,
       canonicalUrl: body.canonicalUrl,
+      focusKeyword: body.focusKeyword,
+      secondaryKeywords: Array.isArray(body.secondaryKeywords) ? body.secondaryKeywords : [],
       noIndex: Boolean(body.noIndex),
     };
 
     CMS_DB.upsertArticle(newArticle);
+
+    try {
+      const { revalidatePath } = await import("next/cache");
+      revalidatePath("/");
+      revalidatePath(`/article/${newArticle.slug || newArticle.id}`);
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/news-sitemap.xml");
+    } catch {}
 
     CMS_DB.addAuditLog({
       adminId: session.userId,

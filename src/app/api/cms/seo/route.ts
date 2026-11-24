@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSessionFromCookies } from "@/lib/cms/permissions";
 import { CMS_DB } from "@/lib/cms/db";
 
@@ -24,14 +25,23 @@ export async function POST(request: Request) {
 
     CMS_DB.saveSEOSettings(updated);
 
-    CMS_DB.addAuditLog({
-      adminId: session.userId,
-      adminEmail: session.email,
-      adminName: session.name,
-      action: "SEO_UPDATE",
-      targetType: "SETTINGS",
-      details: "Updated global SEO and Open Graph metadata",
-    });
+    // Revalidate public layouts to immediately propagate updated metadata
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/news-sitemap.xml");
+    } catch {}
+
+    try {
+      CMS_DB.addAuditLog({
+        adminId: session.userId,
+        adminEmail: session.email,
+        adminName: session.name,
+        action: "SEO_UPDATE",
+        targetType: "SETTINGS",
+        details: "Updated global SEO, Open Graph metadata, and search configuration",
+      });
+    } catch {}
 
     return NextResponse.json({ success: true, data: updated });
   } catch (err: any) {
