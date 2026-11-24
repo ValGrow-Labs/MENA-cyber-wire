@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import HomeClient from "@/components/home/HomeClient";
 import { CMS_DB } from "@/lib/cms/db";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const homeMeta = seo.pageMetadata?.home;
 
   const title = homeMeta?.title || "MENA Cyber Wire: Real-time Cyber Security Intelligence for Middle East & North Africa";

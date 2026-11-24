@@ -7,6 +7,7 @@ import StoryCover from "@/components/shared/StoryCover";
 import ThreatSeverityBadge from "@/components/shared/ThreatSeverityBadge";
 import { ArrowLeft, Tag } from "lucide-react";
 import { NewsArticle } from "@/types/news";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const categories = CMS_DB.getCategories();
   const category = categories.find((c) => c.slug === params.slug);
 
@@ -76,7 +77,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default function CategoryPage({ params }: CategoryPageProps) {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const categories = CMS_DB.getCategories();
   const category = categories.find((c) => c.slug === params.slug);
 

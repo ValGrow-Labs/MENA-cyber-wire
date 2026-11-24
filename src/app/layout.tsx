@@ -6,6 +6,7 @@ import { themeInitScript } from "@/components/shared/ThemeToggle";
 import { CMS_DB } from "@/lib/cms/db";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
+import { getBaseUrl } from "@/lib/seo/config";
 
 const sans = Source_Sans_3({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["normal", "italic"], adjustFontFallback: false });
@@ -20,7 +21,7 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
 
   return {
     metadataBase: new URL(baseUrl),
@@ -94,7 +95,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
 
   return (
     <html lang="en" suppressHydrationWarning className={`${sans.variable} ${serif.variable} ${mono.variable}`}>

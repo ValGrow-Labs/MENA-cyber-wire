@@ -831,7 +831,7 @@ export default function ArticleEditorForm({ initialArticle, isNew = false }: Art
                 type="url"
                 value={canonicalUrl}
                 onChange={(e) => setCanonicalUrl(e.target.value)}
-                placeholder="https://menacyberwire.com/article/..."
+                placeholder="https://mena-cyber-wire.vercel.app/article/..."
                 className="mt-1 w-full rounded border border-[#2B2B2B] bg-[#191919] p-2 font-mono text-xs text-[#F5F5F5] focus:outline-none"
               />
             </div>

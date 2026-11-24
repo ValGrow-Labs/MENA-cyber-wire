@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CMS_DB } from "@/lib/cms/db";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ function escapeXml(unsafe: string): string {
 
 export async function GET() {
   const seoSettings = CMS_DB.getSEOSettings();
-  const baseUrl = (seoSettings.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seoSettings.canonicalBaseUrl);
   const publicationName = seoSettings.publisherName || "MENA Cyber Wire";
 
   // Google News requires recent eligible news articles

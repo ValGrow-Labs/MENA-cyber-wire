@@ -38,14 +38,14 @@ export default function CMSSEOPage() {
   const [defaultDescription, setDefaultDescription] = useState("");
   const [keywordsInput, setKeywordsInput] = useState("");
   const [defaultOgImage, setDefaultOgImage] = useState("");
-  const [canonicalBaseUrl, setCanonicalBaseUrl] = useState("https://menacyberwire.com");
+  const [canonicalBaseUrl, setCanonicalBaseUrl] = useState("https://mena-cyber-wire.vercel.app");
   const [twitterHandle, setTwitterHandle] = useState("@menacyberwire");
   const [robotsTxtContent, setRobotsTxtContent] = useState("");
   const [googleSiteVerification, setGoogleSiteVerification] = useState("");
   const [bingSiteVerification, setBingSiteVerification] = useState("");
   const [gaMeasurementId, setGaMeasurementId] = useState("");
   const [publisherName, setPublisherName] = useState("MENA Cyber Wire");
-  const [publisherLogoUrl, setPublisherLogoUrl] = useState("https://menacyberwire.com/logo.png");
+  const [publisherLogoUrl, setPublisherLogoUrl] = useState("https://mena-cyber-wire.vercel.app/logo.png");
   const [contactEmail, setContactEmail] = useState("editor@menacyberwire.com");
 
   // Social Profiles
@@ -94,14 +94,14 @@ export default function CMSSEOPage() {
           setDefaultDescription(d.defaultDescription || "");
           setKeywordsInput((d.keywords || []).join(", "));
           setDefaultOgImage(d.defaultOgImage || "");
-          setCanonicalBaseUrl(d.canonicalBaseUrl || "https://menacyberwire.com");
+          setCanonicalBaseUrl(d.canonicalBaseUrl || "https://mena-cyber-wire.vercel.app");
           setTwitterHandle(d.twitterHandle || "@menacyberwire");
           setRobotsTxtContent(d.robotsTxtContent || "");
           setGoogleSiteVerification(d.googleSiteVerification || "");
           setBingSiteVerification(d.bingSiteVerification || "");
           setGaMeasurementId(d.gaMeasurementId || "");
           setPublisherName(d.publisherName || "MENA Cyber Wire");
-          setPublisherLogoUrl(d.publisherLogoUrl || "https://menacyberwire.com/logo.png");
+          setPublisherLogoUrl(d.publisherLogoUrl || "https://mena-cyber-wire.vercel.app/logo.png");
           setContactEmail(d.contactEmail || "editor@menacyberwire.com");
 
           if (d.socialProfiles) {

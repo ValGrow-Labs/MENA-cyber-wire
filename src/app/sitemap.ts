@@ -1,11 +1,12 @@
 import { MetadataRoute } from "next";
 import { CMS_DB } from "@/lib/cms/db";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const seoSettings = CMS_DB.getSEOSettings();
-  const baseUrl = (seoSettings.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seoSettings.canonicalBaseUrl);
 
   const now = new Date();
 

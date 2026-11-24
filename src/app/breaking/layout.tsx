@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { CMS_DB } from "@/lib/cms/db";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const pageMeta = seo.pageMetadata?.breaking;
 
   const title = pageMeta?.title || "Breaking Cybersecurity News & Active Incident Wire | MENA Cyber Wire";
@@ -56,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function BreakingLayout({ children }: { children: React.ReactNode }) {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
 
   return (
     <>

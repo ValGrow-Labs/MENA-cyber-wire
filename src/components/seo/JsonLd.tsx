@@ -11,8 +11,8 @@ interface OrganizationSchemaProps {
 
 export function OrganizationJsonLd({
   name = "MENA Cyber Wire",
-  url = "https://menacyberwire.com",
-  logoUrl = "https://menacyberwire.com/logo.png",
+  url = "https://mena-cyber-wire.vercel.app",
+  logoUrl = "https://mena-cyber-wire.vercel.app/logo.png",
   description = "Regional Cyber Intelligence. Real-time Awareness. Independent reporting on attacks, vulnerabilities, and policy across the Middle East & North Africa.",
   socialLinks = [
     "https://twitter.com/menacyberwire",
@@ -60,7 +60,7 @@ interface WebSiteSchemaProps {
 
 export function WebSiteJsonLd({
   name = "MENA Cyber Wire",
-  url = "https://menacyberwire.com",
+  url = "https://mena-cyber-wire.vercel.app",
   description = "Middle East and North Africa Cybersecurity News and Threat Intelligence",
 }: WebSiteSchemaProps) {
   const schema = {
@@ -112,7 +112,7 @@ export function NewsArticleJsonLd({
   imageUrl,
   authorName = "MENA Cyber Wire Intelligence Desk",
   publisherName = "MENA Cyber Wire",
-  publisherLogoUrl = "https://menacyberwire.com/logo.png",
+  publisherLogoUrl = "https://mena-cyber-wire.vercel.app/logo.png",
   articleSection = "Cybersecurity",
   keywords = [],
   country,

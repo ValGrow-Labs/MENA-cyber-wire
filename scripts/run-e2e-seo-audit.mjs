@@ -122,8 +122,8 @@ async function runAudit() {
     const hasApi = urls.some((u) => String(u.loc || "").includes("/api/"));
     test("Sitemap excludes /api/ routes", !hasApi, "Found api route in sitemap!");
 
-    const hasCanonicalDomain = urls.every((u) => String(u.loc || "").startsWith("https://menacyberwire.com"));
-    test("All sitemap URLs use canonical https://menacyberwire.com", hasCanonicalDomain, "Some URLs lack canonical domain");
+    const hasCanonicalDomain = urls.every((u) => String(u.loc || "").startsWith("https://mena-cyber-wire.vercel.app"));
+    test("All sitemap URLs use canonical https://mena-cyber-wire.vercel.app", hasCanonicalDomain, "Some URLs lack canonical domain");
 
     const hasCountryDesks = urls.some((u) => String(u.loc || "").includes("/country/saudi-arabia"));
     test("Sitemap includes national country desks", hasCountryDesks, "saudi-arabia desk missing");
@@ -180,7 +180,7 @@ async function runAudit() {
     const meta = parseMeta(res.body);
     test("Homepage <title> present", meta.title.length > 10, `Title: "${meta.title}"`);
     test("Homepage <meta name='description'> present", (meta.metaTags["description"] || "").length > 40, `Desc: "${meta.metaTags["description"]}"`);
-    test("Homepage canonical URL present", meta.canonical.startsWith("https://menacyberwire.com"), `Canonical: "${meta.canonical}"`);
+    test("Homepage canonical URL present", meta.canonical.startsWith("https://mena-cyber-wire.vercel.app"), `Canonical: "${meta.canonical}"`);
     test("Homepage OpenGraph title present", !!meta.metaTags["og:title"], "og:title missing");
     test("Homepage OpenGraph image present", !!meta.metaTags["og:image"], "og:image missing");
     test("Homepage Twitter Card configured", meta.metaTags["twitter:card"] === "summary_large_image", `Card: "${meta.metaTags["twitter:card"]}"`);

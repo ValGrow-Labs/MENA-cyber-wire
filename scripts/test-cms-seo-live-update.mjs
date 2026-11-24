@@ -52,7 +52,7 @@ const testArticle = {
   region: "Gulf",
   tags: ["Audit", "ZeroDay", "GCC"],
   sourceName: "MENA Cyber Wire Intelligence Desk",
-  sourceUrl: "https://menacyberwire.com",
+  sourceUrl: "https://mena-cyber-wire.vercel.app",
   author: "Senior Cyber Desk Editor",
   publishedAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),

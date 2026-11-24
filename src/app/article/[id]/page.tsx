@@ -5,6 +5,7 @@ import { CURATED_MENA_INTELLIGENCE } from "@/lib/news/curated-seed";
 import ArticleClient from "@/components/article/ArticleClient";
 import { NewsArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { NewsArticle } from "@/types/news";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,7 @@ function resolveArticle(identifier: string): NewsArticle | null {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const article = resolveArticle(params.id);
 
   if (!article) {
@@ -145,7 +146,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default function ArticlePage({ params }: PageProps) {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const article = resolveArticle(params.id);
 
   if (!article) {

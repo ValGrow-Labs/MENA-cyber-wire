@@ -7,6 +7,7 @@ import StoryCover from "@/components/shared/StoryCover";
 import ThreatSeverityBadge from "@/components/shared/ThreatSeverityBadge";
 import { ArrowLeft, Shield, AlertTriangle, Scale, ExternalLink } from "lucide-react";
 import { NewsArticle } from "@/types/news";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ interface CountryPageProps {
 
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const country = CMS_DB.getCountryBySlugOrCode(params.slug);
 
   if (!country) {
@@ -82,7 +83,7 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 
 export default function CountryDeskPage({ params }: CountryPageProps) {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
   const country = CMS_DB.getCountryBySlugOrCode(params.slug);
 
   if (!country) {

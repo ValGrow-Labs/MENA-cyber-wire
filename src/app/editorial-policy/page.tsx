@@ -3,12 +3,13 @@ import Link from "next/link";
 import { CMS_DB } from "@/lib/cms/db";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { Scale, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
+import { getBaseUrl } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
 
   return {
     title: "Editorial & Corrections Policy · MENA Cyber Wire",
@@ -27,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function EditorialPolicyPage() {
   const seo = CMS_DB.getSEOSettings();
-  const baseUrl = (seo.canonicalBaseUrl || "https://menacyberwire.com").replace(/\/$/, "");
+  const baseUrl = getBaseUrl(seo.canonicalBaseUrl);
 
   const breadcrumbs = [
     { name: "Home", item: `${baseUrl}/` },
